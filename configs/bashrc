@@ -1,0 +1,18 @@
+# unfortunately, according to http://mywiki.wooledge.org/BashFAQ/028, there's
+# no way to determine what the currently-executing filename is consistently,
+# so this is code-copied to both zshrc and bashrc. Sadface.
+if [ -z $RCDIR ]; then
+    [ -r "$HOME/.rcdir" ] && RCDIR=$(cat $HOME/.rcdir)
+    [ -z $RCDIR ]         && RCDIR=$HOME/.rc
+
+    [ -d $RCDIR ] || echo "WARNING: RCDIR $RCDIR is not a directory" >&2
+fi
+export RCDIR
+
+# setup our environment
+source "$RCDIR/shell/environment.sh"
+source "$RCDIR/shell/functions.sh"
+source "$RCDIR/shell/aliases.sh"
+
+# bash-specific configuration from here on out
+export HISTFILE="$HOME/.history/bash"

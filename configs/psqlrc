@@ -1,0 +1,13 @@
+-- change the history file location
+\set HISTFILE ~/.history/psql
+
+-- make line separators use unicode (ie, prettier) borders
+\pset linestyle unicode
+
+-- set the borders to look like ascii tables rather than simple separators
+-- (this is more like MySQL's default display)
+\pset border 2
+
+-- display a distinctive unicode character rather than a blank for NULL
+-- values; this helps differentiate from empty strings
+\pset null ¤

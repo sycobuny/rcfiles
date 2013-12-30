@@ -1,0 +1,235 @@
+" allow for project-local vim configurations
+    let s:gitroot = system('git root')
+    if s:gitroot !=# ''
+        let s:gitvimconfig = s:gitroot[0:-2] . "/.git/vimrc"
+        if filereadable(s:gitvimconfig)
+            exec "source " . s:gitvimconfig
+        endif
+
+        let s:projvimconfig = s:gitroot[0:-2] . "/.vimrc"
+        if filereadable(s:projvimconfig)
+            exec "source " . s:projvimconfig
+        endif
+    endif
+
+" allow for directory-local vim configurations as well
+    let s:cwd = system('pwd')
+    if s:cwd !=# '' && s:cwd[0:-2] !=# $HOME
+        " make sure we don't re-run a .vimrc if we're opening in a git
+        " project's root directory
+        if s:cwd !=# s:gitroot
+            let s:cwdvimconfig = s:cwd[0:-2] . "/.vimrc"
+            if filereadable(s:cwdvimconfig)
+                exec "source " . s:cwdvimconfig
+            endif
+        endif
+    endif
+
+" search preferences - boosted from stevelosh
+    " use pcre-ish instead of vim-ish regex
+    nnoremap / /\v
+    vnoremap / /\v
+    " search case-insensitive by default (unless we use uppercase)
+    set ignorecase
+    set smartcase
+    " replace globally by default
+    set gdefault
+    " highlight searches while typing
+    set incsearch
+    set showmatch
+    set hlsearch
+    set smarttab
+    " clear highlights quickly
+    nnoremap <Leader><Space> :noh<cr>
+
+" filesystem management
+    set nowb       " do not create filename~ backups
+    set noswapfile " do not use .filename.swp/swo swap files
+
+" code style preferences
+    set number       " include line numbers, cause why not.
+    set smartindent  " have VIM auto-indent when possible
+    set tabstop=4    " tabs are 4 characters wide by default for most code
+    set shiftwidth=4 " indent level is also 4 characters wide by default
+    set expandtab    " expand tabs to spaces when I push the tab key
+    set nopaste      " do not assume paste mode by default
+    set backspace=indent,eol,start " allow backspacing over indents/etc.
+
+" remap ]], [[, [], and ][ to find block encoding without C-style
+    " Yoinked from vim help, see :help object-motions
+    map [[ ?{<CR>w99[{
+    map ][ /}<CR>b00]}
+    map ]] j0[[%/{<CR>
+    map [] k$][%?}<CR>
+
+" syntax highlighting
+    " first off, turn it on
+    set       t_Co=256 " 256-color terminal
+    syntax    enable   " enable highlighting
+
+    " add overflow column warning coloring
+    if exists('+colorcolumn')
+        set colorcolumn=79
+    else
+        au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
+    endif
+
+    " set text width manually, cause colorcolumn auto-sets it
+    set textwidth=78
+
+    " add specific filenames not detected (yet) by any of my plugins
+    au BufNewFile,BufRead Vagrantfile,Gemfile set ft=ruby
+
+    " fix special case textwidth for git commit messages (fugitive auto-sets
+    " this, but me setting the colorcolumn and textwidth manually breaks that)
+    au FileType gitcommit set textwidth=72
+
+" grab the contents of the visual selection
+" thanks to http://stackoverflow.com/a/6271254
+    function! VS()
+        let [lnum1, col1] = getpos("'<")[1:2]
+        let [lnum2, col2] = getpos("'>")[1:2]
+        let lines = getline(lnum1, lnum2)
+        let lines[-1] = lines[-1][: col2 - 2]
+        let lines[0] = lines[0][col1 - 1:]
+        return join(lines, "\n")
+    endfunction
+
+" send commands using posgres using shift-r
+" idea from Depesz, http://postgr.es/p/1DH
+" slightly modified to dump into register r instead of the buffer
+    vmap R :\|let @r = system('psql -t', VS())<enter>
+
+" break lines around a visual selection
+    vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
+
+" remap jk to exit insert mode, and leave the cursor where it was before
+    inoremap jk <C-c>`^
+
+" learn vim the hard way - disable arrow movement and Esc key
+    inoremap <Up>    <NOP>
+    inoremap <Down>  <NOP>
+    inoremap <Left>  <NOP>
+    inoremap <Right> <NOP>
+    inoremap <Esc>   <NOP>
+    noremap  <Up>    <NOP>
+    noremap  <Down>  <NOP>
+    noremap  <Left>  <NOP>
+    noremap  <Right> <NOP>
+
+" turn on spell-checking in markdown, plaintext files, and git commits; turn
+" it off specifically for help files (which is a subset of plaintext files)
+    au FileType markdown  set spell
+    au FileType gitcommit set spell
+    au BufRead  *.txt     set spell
+    au FileType help      set nospell
+
+" add a DiffWithSaved() command to see what changes we haven't saved yet
+    function! s:DiffWithSaved()
+        let filetype=&ft
+        diffthis
+        vnew | r # | normal! 1Gdd
+        diffthis
+        exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+    endfunction
+    com! DiffSaved call s:DiffWithSaved()
+
+" PLUGIN - vundle
+    " NOTES
+    "   This requires pre-cloning of the git repository, eg:
+    "   $ git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+    " required settings for vundle
+    set      nocompatible
+    filetype off
+    set      rtp+=~/.vim/bundle/vundle
+    call     vundle#rc()
+    " have vundle manage vundle
+    Bundle "gmarik/vundle"
+
+" PLUGIN - powerline
+    " NOTES
+    "    For this to look decent on Mac OS X, you need to download a Powerline
+    "    patched font and enable it, or build your own. I use "Menlo" patched
+    "    from https://gist.github.com/1595572.
+    " install powerline
+    Bundle "Lokaltog/vim-powerline"
+    set laststatus=2                  " turn on statusbar
+    let g:Powerline_symbols = 'fancy' " use fancy utf-8 symbols
+
+" PLUGIN - vim-surround
+    Bundle "tpope/vim-surround"
+
+" PLUGIN - vim-git
+    Bundle "tpope/vim-git"
+
+" PLUGIN - vim-fugitive
+    Bundle "tpope/vim-fugitive"
+
+" PLUGIN - vim-markdown
+    Bundle "tpope/vim-markdown"
+    let g:markdown_fenced_languages = [
+                \     'apacheconf=apache', 'aconf=apache', 'html', 'css',
+                \     'javascript', 'perl', 'ruby', 'php', 'diff'
+                \   ]
+
+" PLUGIN - NERDTree
+    Bundle "scrooloose/nerdtree"
+
+" PLUGIN - undo-tree
+    Bundle "mbbill/undotree"
+
+" PLUGIN - puppet-syntax-vim
+    Bundle "puppetlabs/puppet-syntax-vim"
+    au FileType puppet set shiftwidth=2
+    au FileType puppet set tabstop=2
+
+" PLUGIN - vim-indent-guides
+    Bundle "nathanaelkane/vim-indent-guides"
+    " prevent errors from cropping up
+    hi Normal ctermbg=black
+    let g:indent_guides_start_level = 2 " no clue
+    let g:indent_guides_guide_size  = 1 " no fat guides
+    let g:indent_guides_auto_colors = 0 " skip auto-color decisions
+    " make some pretty colors
+    au VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
+    au VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
+    " turn it on by default
+    au VimEnter * :IndentGuidesEnable
+
+" PLUGIN - SyntaxRange
+    Bundle "SyntaxRange"
+    au FileType vim call SyntaxRange#Include(
+                \     'perl <<', '.', 'perl'
+                \    )
+    au FileType sql call SyntaxRange#Include(
+                \     '  AS \$PERL\$', '  \$PERL\$;', 'perl'
+                \   )
+
+" PLUGIN - vim-slime
+    Bundle "jpalardy/vim-slime"
+    let g:slime_target = "tmux"
+
+" PLUGIN - spacehi
+    Bundle "jpalardy/spacehi.vim"
+
+" PLUGIN - csv
+    " Bundle "csv.vim"
+
+" PLUGIN - delimitMate
+    Bundle "Raimondi/delimitMate"
+
+" PLUGIN - snipMate
+    Bundle "msanders/snipmate.vim"
+    au FileType snippet set noexpandtab
+
+" SYNTAX - perl-mauke
+    " Bundle "vim-scripts/perl-mauke.vim"
+    " let perl_include_pod = 1
+    " let perl_fold        = 1
+
+" COLORSCHEME - BadWolf
+    Bundle "sjl/badwolf"
+    colorscheme badwolf
+
+" post-vundle-install required setting
+    filetype plugin indent on

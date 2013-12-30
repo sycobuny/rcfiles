@@ -1,0 +1,21 @@
+[core]
+    excludesfile = ~/.gitignore_global
+    autocrlf = input
+    editor = /usr/bin/vim
+[color]
+    ui = auto
+[alias]
+    # the way I prefer to see logs - with a colorful graph
+    lg = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)-- %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
+
+    # for scripting - test if the directory has been modified, exit 0 if true,
+    # 1 if false
+    is-dirty = ![ $(git status --porcelain | wc -l) -ne 0 ]
+
+    # sorta like git add -p but for untracked files
+    addp = !git add -N $@ && git add -p
+
+    # directory names - root is the boundary of the repo, dir is the git
+    # directory for the repo (in case we're in a bare repo)
+    root = rev-parse --show-toplevel
+    dir  = rev-parse --git-dir
