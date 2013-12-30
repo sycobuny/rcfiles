@@ -31,4 +31,4 @@ export PAGER='less'
 export LANG='en_US.UTF-8'
 
 # change history file for MySQL
-MYSQL_HISTFILE=$HOME/.history/mysql
+export MYSQL_HISTFILE=$HOME/.history/mysql
