@@ -19,3 +19,5 @@
     # directory for the repo (in case we're in a bare repo)
     root = rev-parse --show-toplevel
     dir  = rev-parse --git-dir
+[push]
+    default = simple
