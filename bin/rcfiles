@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use File::Spec::Functions;
+use Cwd qw(abs_path);
+
+{ package RCFiles;
+    # import subs we just loaded from the main namespace
+    *abs_path = *::abs_path;
+    *catfile  = *::catfile;
+
+    our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
+    our (%settings)  = (
+        'filter.gitconfig.clean'  =>
+            '$(git root)/setup/strip-ini-section.pl %f user',
+        'filter.gitconfig.smudge' => 'cat',
+    );
+
+    predeclared_subs: {
+        sub __success__() { 0 }
+        sub __failure__() { 1 }
+    }
+
+    sub relink {
+        foreach my $symlink (@symlinks) {
+            my ($sympath)  = catfile($ENV{HOME}, ".$symlink");
+            my ($realpath) = catfile($ENV{RCDIR}, 'configs', $symlink);
+            my ($resolved) = abs_path($sympath);
+
+            next if ($resolved eq $realpath);
+
+            if (-e $resolved) {
+                print "=> Moving $resolved to $realpath\n";
+                rename($resolved, $realpath) if (-e $resolved);
+            }
+
+            print "=> Linking $sympath to $realpath\n";
+            symlink($realpath, $sympath);
+        }
+    }
+
+    sub autoconfig {
+        my ($changed);
+        my ($cwd) = `pwd`;
+        chomp($cwd);
+
+        if (!chdir($ENV{RCDIR})) {
+            warn "fatal: Could not change directory to $ENV{RCDIR}\n";
+            return __failure__;
+        }
+
+        while (my ($setting, $value) = each(%settings)) {
+            my ($curval) = `git config $setting` || '';
+            chomp($curval);
+
+            if ($curval ne $value) {
+                $changed = 1;
+
+                $ENV{VALUE} = $value;
+                `git config $setting "\$VALUE"`;
+
+                if ($?) { warn "could not set $setting to $value\n" }
+                else    { print "=> set $setting to $value\n" }
+            }
+        }
+
+        # since nothing else would happen when this is called, let people know
+        # the command was successful.
+        print "=> Existing configuration is valid\n" unless $changed;
+
+        warn "Couldn't return to working directory $cwd\n" unless chdir($cwd);
+        __success__
+    }
+
+    sub status {
+        chdir($ENV{RCDIR});
+        `git is-dirty 2>&1 1>/dev/null`;
+
+        if ($?) {
+            print "RC Files are locally unmodified\n";
+            __success__
+        }
+        else {
+            print "RC Files are dirty\n";
+            __failure__
+        }
+    }
+
+    sub update {
+        my ($output);
+        chdir($ENV{RCDIR}) or return __failure__;
+
+        $output  = `git fetch origin 2>&1`;
+        if ($?) {
+            warn "Could not synchronize with remote repository, aborting.\n";
+            return __failure__;
+        }
+        elsif ($output !~ /Everything up to date/) {
+            print "Synchronized new changes\n";
+        }
+
+        $output  = `git merge --ff-only master origin/master 2>&1`;
+        if ($?) {
+            warn "Could not merge with remote changes, aborting.\n";
+            return __failure__;
+        }
+
+        __success__
+    }
+
+    sub __findsub__ {
+        no strict 'refs';
+        *{"*@{[ __PACKAGE__ ]}::@{[ shift ]}"}{CODE};
+    }
+
+    sub __main__ {
+        my ($command) = shift;
+        exit __failure__ unless $command;
+
+        my ($subref) = __findsub__($command);
+        exit __failure__ unless $subref;
+
+        exit($subref->() || __success__);
+    }
+}
+
+RCFiles::__main__(@ARGV) if ($0 eq __FILE__);
