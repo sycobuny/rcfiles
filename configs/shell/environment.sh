@@ -8,7 +8,7 @@ unset rcbin
 
 # mac-only configurations
 if [ $(uname -a | grep Darwin | wc -l) -ne 0 ]; then
-    source $RCDIR/shell/environment-mac.sh
+    source $RCDIR/configs/shell/environment-mac.sh
 fi
 
 # perlbrew

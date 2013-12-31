@@ -10,9 +10,9 @@ fi
 export RCDIR
 
 # setup our environment
-source "$RCDIR/shell/environment.sh"
-source "$RCDIR/shell/functions.sh"
-source "$RCDIR/shell/aliases.sh"
+source "$RCDIR/configs/shell/environment.sh"
+source "$RCDIR/configs/shell/functions.sh"
+source "$RCDIR/configs/shell/aliases.sh"
 
 # zsh-specific configuration from here on out
 HISTFILE="$HOME/.history/zsh"
