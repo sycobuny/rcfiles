@@ -13,6 +13,8 @@ use Cwd qw(abs_path);
 
     our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
     our (%settings)  = (
+        'alias.full-diff'         => '!$(git root)/setup/git-full-diff.sh',
+        'alias.ls-untracked'      => 'ls-files -o --exclude-standard',
         'alias.is-dirty'          =>
             '![ $(git status --porcelain | wc -l) -ne 0 ]',
         'filter.gitconfig.clean'  =>
@@ -83,8 +85,62 @@ use Cwd qw(abs_path);
             __success__
         }
         else {
-            print "=> RC Files have been locally modified\n";
+            print "=> RC Files have been locally modified\n=>\n";
+            print "=> To view differences, run:\n=>   rcfiles diff\n=>\n";
+            print "=> To save changes, run:\n=>   rcfiles save\n";
+
             __failure__
+        }
+    }
+
+    sub diff {
+        __chdir__ or return __failure__;
+        system(qw(git full-diff)) ? __failure__ : __success__
+    }
+
+    sub save {
+        if (update() == __failure__) {
+            warn "fatal: Will not save without updating\n";
+            return __failure__;
+        }
+
+        __chdir__ or return __failure__;
+        my (@untracked) = `git ls-untracked 2>&1`;
+        my ($exit) = sub {
+            foreach my $untracked (@untracked) {
+                chomp($untracked);
+                $ENV{TO_REMOVE} = $untracked;
+                `git reset HEAD "\$TO_REMOVE"`;
+            }
+            shift;
+        };
+
+        foreach my $untracked (@untracked) {
+            chomp($untracked);
+
+            $ENV{TO_ADD} = $untracked;
+            `git add "\$TO_ADD" 2>&1`;
+
+            if ($?) {
+                warn "fatal: Could not add untracked $untracked\n";
+                return $exit->(__failure__);
+            }
+        }
+
+        system(qw(git commit -a));
+        if ($?) {
+            warn "fatal: Could not complete commit\n";
+            return $exit->(__failure__);
+        }
+
+        `git push 2>&1`;
+        if ($?) {
+            warn "fatal: Could not submit updates to remote 'origin'\n";
+            __failure__
+        }
+        else {
+            print "=> Submitted changes to remote 'origin'\n";
+            __success__
         }
     }
 
