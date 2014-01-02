@@ -45,7 +45,7 @@ use Cwd qw(abs_path);
             symlink($realpath, $sympath);
         }
 
-        __sucess__
+        __success__
     }
 
     sub autoconfig {
