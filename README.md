@@ -19,8 +19,10 @@ repository with a built-in update system. The result, you see, is before you.
 Bask in its glory.
 
 The main points of interaction are the installer script and the `rcfiles`
-script. There are other scripts supplied in the `setup/` directory, but these
-are used mostly for under-the-hood work.
+script. Sometimes, after an update, you might want to run `reshell`, if you're
+absolutely desperate to get the changes in your active shell session right
+now. There are also other scripts supplied in the [setup/](./setup) directory,
+but these are used mostly for under-the-hood work.
 
 Any site-local configuration should reside in the `site/` directory. This
 directory is deliberately ignored by the `.gitignore` for this purpose. There
@@ -36,18 +38,19 @@ I Want To Be "Cool" And "Hip" Like You!
 (AKA: installation instructions)
 --------------------------------
 
-Wait, no! This is a terrible idea, you may just not realize it yet! You
-probably don't want your system configured like mine, and this is but one of
-many repositories of a similar nature. Your best bet is to browse around for
-"dotfiles" repositories around the net, and if you like, to read over
-[mine][./configs] (I've tried to make sure they're well-commented), to get a
-feel for any new and cool things you'd like to do for your own setup.
+Wait, no! This is a terrible idea, you may just not realize it yet! I'm
+actually not very cool, OR hip. Also, you probably don't want your system
+configured like mine, and this is but one of many repositories of a similar
+nature. Your best bet is to browse around for "dotfiles" repositories around
+the net, and if you like, to read over [mine](./configs) (I've tried to make
+sure they're well-commented), to get a feel for any new and cool things you'd
+like to do for your own setup.
 
 If, however, you're really adamant about being as cool as me (ha, ha, ha), or,
 more likely, you're *actually* me and you've forgotten how to run your own
 installer (for shame), continue on...
 
-The installer script is located at [setup/install.pl][./setup/install.pl]. You
+The installer script is located at [setup/install.pl](./setup/install.pl). You
 can either download the file and execute it, or run it directly from
 [GitHub][]:
 
@@ -64,7 +67,7 @@ Location, Location, Location
 ----------------------------
 
 The installer will put the repository in `~/.rc` by default, and clone from
-[github.com/sycobuny/rcfiles][https://github.com/sycobuny/rcfiles]. These
+[github.com/sycobuny/rcfiles](https://github.com/sycobuny/rcfiles). These
 settings can be overridden by supplying the following environment variables:
 
   * `$RCDIR` - Where to install the repository locally
@@ -104,10 +107,10 @@ License
 =======
 
 Anything that I wrote in this repository is licensed under the MIT license
-(see [LICENSE.md][./LICENSE.md]).
+(see [LICENSE.md](./LICENSE.md)).
 
 Notably, I did a significant rewrite of the `tmx()` shell function in
-[configs/shell/functions-tmx.sh][./configs/shell/functions-tmx.sh], but it was
+[configs/shell/functions-tmx.sh](./configs/shell/functions-tmx.sh), but it was
 originally posted on the [Gentoo Forums][]. If it were to default to any sort
 of license, I'd guess GPL (though I personally would never willingly choose
 this license #ConfessYourUnpopularOpinion). Content note: I Am Not A Lawyer
@@ -115,7 +118,7 @@ and the specifics of this kind of use case elude me. Feel free to enlighten
 me, if you `/(d|c)are/`.
 
 Pretty much the entirety of the code in
-[setup/git-diff-full.sh][./setup/git-diff-full.sh] (minus a couple stylistic
+[setup/git-diff-full.sh](./setup/git-diff-full.sh) (minus a couple stylistic
 tweaks) was a posted answer on [Stack Overflow][], and therefore did not have
 a license directly attached either. Again, I'm not a lawyer but I believe this
 means it's, by default, under [Creative Commons][] per the
