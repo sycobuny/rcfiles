@@ -61,7 +61,7 @@ use Cwd qw(abs_path);
                 $ENV{VALUE} = $value;
                 `git config $setting "\$VALUE"`;
 
-                if ($?) { warn "could not set $setting to $value\n" }
+                if ($?) { warn "Could not set $setting to $value\n" }
                 else    { print "=> set $setting to $value\n" }
             }
         }
