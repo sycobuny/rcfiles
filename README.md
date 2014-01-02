@@ -47,8 +47,8 @@ If, however, you're really adamant about being as cool as me (ha, ha, ha), or,
 more likely, you're *actually* me and you've forgotten how to run your own
 installer (for shame), continue on...
 
-The installer script is located at [`setup/install.pl`][./setup/install.pl].
-You can either download the file and execute it, or run it directly from
+The installer script is located at [setup/install.pl][./setup/install.pl]. You
+can either download the file and execute it, or run it directly from
 [GitHub][]:
 
 ```shell
@@ -64,7 +64,7 @@ Location, Location, Location
 ----------------------------
 
 The installer will put the repository in `~/.rc` by default, and clone from
-[`github.com/sycobuny/rcfiles`][https://github.com/sycobuny/rcfiles]. These
+[github.com/sycobuny/rcfiles][https://github.com/sycobuny/rcfiles]. These
 settings can be overridden by supplying the following environment variables:
 
   * `$RCDIR` - Where to install the repository locally
@@ -107,15 +107,15 @@ Anything that I wrote in this repository is licensed under the MIT license
 (see [LICENSE.md][./LICENSE.md]).
 
 Notably, I did a significant rewrite of the `tmx()` shell function in
-[`configs/shell/functions-tmx.sh`][./configs/shell/functions-tmx.sh], but it
-was originally posted on the [Gentoo Forums][]. If it were to default to any
-sort of license, I'd guess GPL (though I personally would never willingly
-choose this license #ConfessYourUnpopularOpinion). Content note: I Am Not A
-Lawyer and the specifics of this kind of use case elude me. Feel free to
-enlighten me, if you `/(d|c)are/`.
+[configs/shell/functions-tmx.sh][./configs/shell/functions-tmx.sh], but it was
+originally posted on the [Gentoo Forums][]. If it were to default to any sort
+of license, I'd guess GPL (though I personally would never willingly choose
+this license #ConfessYourUnpopularOpinion). Content note: I Am Not A Lawyer
+and the specifics of this kind of use case elude me. Feel free to enlighten
+me, if you `/(d|c)are/`.
 
 Pretty much the entirety of the code in
-[`setup/git-diff-full.sh`][./setup/git-diff-full.sh] (minus a couple stylistic
+[setup/git-diff-full.sh][./setup/git-diff-full.sh] (minus a couple stylistic
 tweaks) was a posted answer on [Stack Overflow][], and therefore did not have
 a license directly attached either. Again, I'm not a lawyer but I believe this
 means it's, by default, under [Creative Commons][] per the
