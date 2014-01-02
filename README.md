@@ -121,7 +121,7 @@ Pretty much the entirety of the code in
 [setup/git-diff-full.sh](./setup/git-diff-full.sh) (minus a couple stylistic
 tweaks) was a posted answer on [Stack Overflow][], and therefore did not have
 a license directly attached either. Again, I'm not a lawyer but I believe this
-means it's, by default, under [Creative Commons][] per the
+means it's, by default, under [Creative Commons Share-Alike][] per the
 [Stack Exchange TOS][].
 
 =====
@@ -134,3 +134,5 @@ means it's, by default, under [Creative Commons][] per the
 [Gentoo Forums]:      http://forums.gentoo.org/
 [Stack Overflow]:     http://stackoverflow.com/
 [Stack Exchange TOS]: http://stackexchange.com/legal
+
+[Creative Commons Share-Alike]: http://creativecommons.org/licenses/by-sa/2.5/
