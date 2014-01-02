@@ -81,17 +81,17 @@ use Cwd qw(abs_path);
         `git is-dirty 2>&1 1>/dev/null`;
 
         if ($?) {
-            print "RC Files are locally unmodified\n";
+            print "=> RC Files are locally unmodified\n";
             __success__
         }
         else {
-            print "RC Files are dirty\n";
+            print "=> RC Files have been locally modified\n";
             __failure__
         }
     }
 
     sub update {
-        my ($output);
+        my ($output, $changed);
         chdir($ENV{RCDIR}) or return __failure__;
 
         $output  = `git fetch origin 2>&1`;
@@ -99,16 +99,22 @@ use Cwd qw(abs_path);
             warn "Could not synchronize with remote repository, aborting.\n";
             return __failure__;
         }
-        elsif ($output !~ /Everything up to date/) {
-            print "Synchronized new changes\n";
+        elsif ($output) {
+            print "=> Synchronized new changes\n";
+            $changed = 1;
         }
 
-        $output  = `git merge --ff-only master origin/master 2>&1`;
+        $output = `git merge --ff-only master origin/master 2>&1`;
         if ($?) {
             warn "Could not merge with remote changes, aborting.\n";
             return __failure__;
         }
+        elsif ($output !~ /Already up-to-date\./) {
+            print "=> Merged new changes from 'origin'\n";
+            $changed = 1;
+        }
 
+        print "=> No new updates\n" unless $changed;
         __success__
     }
 
