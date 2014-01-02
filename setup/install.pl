@@ -149,5 +149,8 @@ load_library();
 RCFiles::relink();
 
 # set up the local git configuration, currently, this:
+#   * adds a `git full-diff` alias for diffing even untracked files
+#   * adds a `git ls-untracked` alias for easily getting all untracked files
+#   * adds a `git is-dirty` alias for easily checking if changes exist
 #   * sets a filter on ~/.gitconfig to ignore [user] sections
 RCFiles::autoconfig();
