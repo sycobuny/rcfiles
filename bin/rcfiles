@@ -173,6 +173,12 @@ use Cwd qw(abs_path);
         if ($changed) {
             autoconfig();
             relink();
+
+            print "=> Update process complete\n";
+            print "=> Please run the following to reload configuration for " .
+                  "any active shell sessions:\n";
+            print "=>\n";
+            print "=>   reshell\n";
         }
         else {
             print "=> No new updates\n" unless $changed;
