@@ -30,7 +30,7 @@ ideally contain any local aliases useful for that machine, and the other any
 useful shell functions, though there is no restriction or checking done on
 either; it is merely convention.
 
-This Sounds So Hot Right Now, I Want It
+I Want To Be "Cool" And "Hip" Like You!
 =======================================
 
 (AKA: installation instructions)
