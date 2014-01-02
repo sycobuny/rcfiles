@@ -44,6 +44,8 @@ use Cwd qw(abs_path);
             print "=> Linking $sympath to $realpath\n";
             symlink($realpath, $sympath);
         }
+
+        __sucess__
     }
 
     sub autoconfig {
@@ -168,7 +170,13 @@ use Cwd qw(abs_path);
             $changed = 1;
         }
 
-        print "=> No new updates\n" unless $changed;
+        if ($changed) {
+            autoconfig();
+            relink();
+        }
+        else {
+            print "=> No new updates\n" unless $changed;
+        }
         __success__
     }
 
