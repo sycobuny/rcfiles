@@ -175,6 +175,13 @@
 " PLUGIN - NERDTree
     Bundle "scrooloose/nerdtree"
 
+" PLUGIN - Syntastic
+    Bundle "scrooloose/syntastic"
+    let g:syntastic_check_on_open = 1
+    let g:syntastic_mode_map = { 'mode': 'active',
+                \     'passive_filetypes': ['php']
+                \   }
+
 " PLUGIN - undo-tree
     Bundle "mbbill/undotree"
 
@@ -200,7 +207,7 @@
     Bundle "SyntaxRange"
     au FileType vim call SyntaxRange#Include(
                 \     'perl <<', '.', 'perl'
-                \    )
+                \   )
     au FileType sql call SyntaxRange#Include(
                 \     '  AS \$PERL\$', '  \$PERL\$;', 'perl'
                 \   )
@@ -212,9 +219,6 @@
 " PLUGIN - spacehi
     Bundle "jpalardy/spacehi.vim"
 
-" PLUGIN - csv
-    " Bundle "csv.vim"
-
 " PLUGIN - delimitMate
     Bundle "Raimondi/delimitMate"
 
@@ -222,10 +226,16 @@
     Bundle "msanders/snipmate.vim"
     au FileType snippet set noexpandtab
 
+" PLUGIN - php.vim
+    " we're manually specifying the vim-scripts repository to load, as many
+    " scripts have this name and we just wind up with the earliest one, rather
+    " than the most recent
+    Bundle "vim-scripts/php.vim--Garvin"
+
 " SYNTAX - perl-mauke
-    " Bundle "vim-scripts/perl-mauke.vim"
-    " let perl_include_pod = 1
-    " let perl_fold        = 1
+    Bundle "vim-scripts/perl-mauke.vim"
+    let perl_include_pod = 1
+    let perl_fold        = 1
 
 " COLORSCHEME - BadWolf
     Bundle "sjl/badwolf"
