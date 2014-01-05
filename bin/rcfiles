@@ -16,6 +16,8 @@ use Cwd qw(abs_path);
     our (%settings)  = (
         'alias.full-diff'         => '!$(git root)/setup/git-full-diff.sh',
         'alias.ls-untracked'      => 'ls-files -o --exclude-standard',
+        'alias.full-reset'        =>
+            '!git reset --hard HEAD && git clean -fx',
         'alias.is-dirty'          =>
             '![ $(git status --porcelain | wc -l) -ne 0 ]',
         'filter.gitconfig.clean'  =>
@@ -112,6 +114,9 @@ use Cwd qw(abs_path);
             __good '';
             __good 'To save changes, run:';
             __good '  rcfiles save';
+            __good '';
+            __good 'To clear changes, run:';
+            __good '  rcfiles reset';
 
             __failure__
         }
@@ -159,6 +164,19 @@ use Cwd qw(abs_path);
         `git push 2>&1`;
         if ($?) { __die 'Could not submit updates to remote "origin"' }
         else    { __good 'Submitted changes to remote "origin"'       }
+    }
+
+    sub reset {
+        __chdir or return __failure__;
+
+        if (do { local $__QUIET__ = 1; status() } == __success__) {
+            __good 'Nothing to do';
+            return __success__;
+        }
+
+        `git full-reset`;
+        if ($?) { __die 'Could not reset all local modifications' }
+        else    { __good 'RC Files have been reset'               }
     }
 
     sub update {
