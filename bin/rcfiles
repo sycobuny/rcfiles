@@ -24,13 +24,24 @@ use Cwd qw(abs_path);
     );
 
     predeclared_subs: {
-        sub __print__($);
-        sub __warn__($);
-        sub __chdir__(;$);
+        # pseudo-constants
         sub __success__() { 0 }
         sub __failure__() { 1 }
+
+        # silence-able wrappers to print() and warn()
+        sub __print($);
+        sub __warn($);
+
+        # consistently-styled messages
+        sub __good($);
+        sub __bad($);
+        sub __die($);
+
+        # switch to the repository directory consistently
+        sub __chdir(;$);
     }
 
+    # TODO: make it confirm successes/failures AFTER actions
     sub relink {
         foreach my $symlink (@symlinks) {
             my ($sympath)  = catfile($ENV{HOME}, ".$symlink");
@@ -40,11 +51,11 @@ use Cwd qw(abs_path);
             next if ($resolved eq $realpath);
 
             if (-e $resolved) {
-                __print__ "=> Moving $resolved to $realpath\n";
+                __good "Moving $resolved to $realpath";
                 rename($resolved, $realpath) if (-e $resolved);
             }
 
-            __print__ "=> Linking $sympath to $realpath\n";
+            __good "Linking $sympath to $realpath";
             symlink($realpath, $sympath);
         }
 
@@ -56,7 +67,7 @@ use Cwd qw(abs_path);
         my ($cwd) = `pwd`;
         chomp($cwd);
 
-        __chdir__ or return __failure__;
+        __chdir or return __failure__;
 
         while (my ($setting, $value) = each(%settings)) {
             my ($curval) = `git config $setting` || '';
@@ -68,50 +79,55 @@ use Cwd qw(abs_path);
                 $ENV{VALUE} = $value;
                 `git config $setting "\$VALUE"`;
 
-                if ($?) { __warn__ "Could not set $setting to $value\n" }
-                else    { __print__ "=> set $setting to $value\n" }
+                if ($?) { __bad "Could not set $setting to $value" }
+                else    { __good "Set $setting to $value" }
             }
         }
 
         # since nothing else would happen when this is called, let people know
         # the command was successful.
-        __print__ "=> Existing configuration is valid\n" unless $changed;
+        __good 'Existing configuration is valid' unless $changed;
 
-        unless (chdir $cwd) {
-            __warn__ "Couldn't return to working directory $cwd\n";
-        }
+        # try to go back to the former working directory, and warn people if
+        # we can't
+        __bad "Couldn't return to working directory $cwd" unless chdir($cwd);
+
+        # by now, though, we've done everything we were tasked with doing
         __success__
     }
 
     sub status {
-        __chdir__ or return __failure__;
+        __chdir or return __failure__;
 
         `git is-dirty 2>&1 1>/dev/null`;
         if ($?) {
-            __print__ "=> RC Files are locally unmodified\n";
+            __good 'RC Files are locally unmodified';
             __success__
         }
         else {
-            __print__ "=> RC Files have been locally modified\n=>\n";
-            __print__ "=> To view differences, run:\n=>   rcfiles diff\n=>\n";
-            __print__ "=> To save changes, run:\n=>   rcfiles save\n";
+            __good 'RC Files have been locally modified';
+            __good '';
+            __good 'To view differences, run:';
+            __good '  rcfiles diff';
+            __good '';
+            __good 'To save changes, run:';
+            __good '  rcfiles save';
 
             __failure__
         }
     }
 
     sub diff {
-        __chdir__ or return __failure__;
+        __chdir or return __failure__;
         system(qw(git full-diff)) ? __failure__ : __success__
     }
 
     sub save {
         if (update() == __failure__) {
-            __warn__ "fatal: Will not save without updating\n";
-            return __failure__;
+            return __die "Will not save without updating";
         }
 
-        __chdir__ or return __failure__;
+        __chdir or return __failure__;
         my (@untracked) = `git ls-untracked 2>&1`;
         my ($exit) = sub {
             foreach my $untracked (@untracked) {
@@ -129,49 +145,41 @@ use Cwd qw(abs_path);
             `git add "\$TO_ADD" 2>&1`;
 
             if ($?) {
-                __warn__ "fatal: Could not add untracked $untracked\n";
+                __die "Could not add untracked $untracked";
                 return $exit->(__failure__);
             }
         }
 
         system(qw(git commit -a));
         if ($?) {
-            __warn__ "fatal: Could not complete commit\n";
+            __die 'Could not complete commit';
             return $exit->(__failure__);
         }
 
         `git push 2>&1`;
-        if ($?) {
-            __warn__ "fatal: Could not submit updates to remote 'origin'\n";
-            __failure__
-        }
-        else {
-            __print__ "=> Submitted changes to remote 'origin'\n";
-            __success__
-        }
+        if ($?) { __die 'Could not submit updates to remote "origin"' }
+        else    { __good 'Submitted changes to remote "origin"'       }
     }
 
     sub update {
         my ($output, $changed);
-        __chdir__ or return __failure__;
+        __chdir or return __failure__;
 
         $output  = `git fetch origin 2>&1`;
         if ($?) {
-            __warn__ "fatal: Could not synchronize with remote repository\n";
-            return __failure__;
+            return __die 'Could not synchronize with remote repository';
         }
         elsif ($output) {
-            __print__ "=> Synchronized new changes\n";
+            __good 'Synchronized new changes';
             $changed = 1;
         }
 
         $output = `git merge --ff-only master origin/master 2>&1`;
         if ($?) {
-            __warn__ "fatal: Could not merge with remote changes\n";
-            return __failure__;
+            return __die "Could not merge with remote changes";
         }
         elsif ($output !~ /Already up-to-date\./) {
-            __print__ "=> Merged new changes from 'origin'\n";
+            __good 'Merged new changes from "origin"';
             $changed = 1;
         }
 
@@ -179,43 +187,55 @@ use Cwd qw(abs_path);
             autoconfig();
             relink();
 
-            __print__ "=> Update process complete\n";
-            __print__ "=> Please run the following to reload configuration " .
-                      "for any active shell sessions:\n";
-            __print__ "=>\n";
-            __print__ "=>   reshell\n";
+            __good 'Update process complete';
+            __good '';
+            __good 'Please run the following to reload configuration for ' .
+                   'any active shell sessions:';
+            __good '  reshell';
         }
         else {
-            __print__ "=> No new updates\n" unless $changed;
+            __good 'No new updates';
         }
-        __success__
     }
 
-    sub __print__($) {
+    sub __print($) {
         return if $__QUIET__;
         print shift;
     }
 
-    sub __warn__($) {
+    sub __warn($) {
         return if $__QUIET__;
         warn shift;
     }
 
-    sub __chdir__(;$) {
+    sub __good($) {
+        __print "=> @{[ shift ]}\n";
+        __success__
+    }
+
+    sub __bad($) {
+        __warn "@{[ shift ]}\n";
+    }
+
+    sub __die($) {
+        __warn "fatal: @{[ shift ]}\n";
+        __failure__
+    }
+
+    sub __chdir(;$) {
         my ($nonfatal) = shift;
 
         unless (chdir($ENV{RCDIR})) {
-            my ($errmsg) = "Could not switch to $ENV{RCDIR}\n";
-            $errmsg = "fatal: $errmsg" unless $nonfatal;
+            my ($errmsg) = "Could not switch to $ENV{RCDIR}";
 
-            warn $errmsg;
+            $nonfatal ? __bad($errmsg) : __die($errmsg);
             return;
         }
 
         return 1;
     }
 
-    sub __findsub__ {
+    sub __findsub($) {
         no strict 'refs';
         *{"*@{[ __PACKAGE__ ]}::@{[ shift ]}"}{CODE};
     }
@@ -224,7 +244,7 @@ use Cwd qw(abs_path);
         my ($command) = shift;
         exit __failure__ unless $command;
 
-        my ($subref) = __findsub__($command);
+        my ($subref) = __findsub($command);
         exit __failure__ unless $subref;
 
         exit($subref->() || __success__);
