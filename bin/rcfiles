@@ -11,6 +11,7 @@ use Cwd qw(abs_path);
     *abs_path = *::abs_path;
     *catfile  = *::catfile;
 
+    our ($__QUIET__) = 0;
     our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
     our (%settings)  = (
         'alias.full-diff'         => '!$(git root)/setup/git-full-diff.sh',
@@ -23,6 +24,8 @@ use Cwd qw(abs_path);
     );
 
     predeclared_subs: {
+        sub __print__($);
+        sub __warn__($);
         sub __chdir__(;$);
         sub __success__() { 0 }
         sub __failure__() { 1 }
@@ -37,11 +40,11 @@ use Cwd qw(abs_path);
             next if ($resolved eq $realpath);
 
             if (-e $resolved) {
-                print "=> Moving $resolved to $realpath\n";
+                __print__ "=> Moving $resolved to $realpath\n";
                 rename($resolved, $realpath) if (-e $resolved);
             }
 
-            print "=> Linking $sympath to $realpath\n";
+            __print__ "=> Linking $sympath to $realpath\n";
             symlink($realpath, $sympath);
         }
 
@@ -65,16 +68,18 @@ use Cwd qw(abs_path);
                 $ENV{VALUE} = $value;
                 `git config $setting "\$VALUE"`;
 
-                if ($?) { warn "Could not set $setting to $value\n" }
-                else    { print "=> set $setting to $value\n" }
+                if ($?) { __warn__ "Could not set $setting to $value\n" }
+                else    { __print__ "=> set $setting to $value\n" }
             }
         }
 
         # since nothing else would happen when this is called, let people know
         # the command was successful.
-        print "=> Existing configuration is valid\n" unless $changed;
+        __print__ "=> Existing configuration is valid\n" unless $changed;
 
-        warn "Couldn't return to working directory $cwd\n" unless chdir($cwd);
+        unless (chdir $cwd) {
+            __warn__ "Couldn't return to working directory $cwd\n";
+        }
         __success__
     }
 
@@ -83,13 +88,13 @@ use Cwd qw(abs_path);
 
         `git is-dirty 2>&1 1>/dev/null`;
         if ($?) {
-            print "=> RC Files are locally unmodified\n";
+            __print__ "=> RC Files are locally unmodified\n";
             __success__
         }
         else {
-            print "=> RC Files have been locally modified\n=>\n";
-            print "=> To view differences, run:\n=>   rcfiles diff\n=>\n";
-            print "=> To save changes, run:\n=>   rcfiles save\n";
+            __print__ "=> RC Files have been locally modified\n=>\n";
+            __print__ "=> To view differences, run:\n=>   rcfiles diff\n=>\n";
+            __print__ "=> To save changes, run:\n=>   rcfiles save\n";
 
             __failure__
         }
@@ -102,7 +107,7 @@ use Cwd qw(abs_path);
 
     sub save {
         if (update() == __failure__) {
-            warn "fatal: Will not save without updating\n";
+            __warn__ "fatal: Will not save without updating\n";
             return __failure__;
         }
 
@@ -124,24 +129,24 @@ use Cwd qw(abs_path);
             `git add "\$TO_ADD" 2>&1`;
 
             if ($?) {
-                warn "fatal: Could not add untracked $untracked\n";
+                __warn__ "fatal: Could not add untracked $untracked\n";
                 return $exit->(__failure__);
             }
         }
 
         system(qw(git commit -a));
         if ($?) {
-            warn "fatal: Could not complete commit\n";
+            __warn__ "fatal: Could not complete commit\n";
             return $exit->(__failure__);
         }
 
         `git push 2>&1`;
         if ($?) {
-            warn "fatal: Could not submit updates to remote 'origin'\n";
+            __warn__ "fatal: Could not submit updates to remote 'origin'\n";
             __failure__
         }
         else {
-            print "=> Submitted changes to remote 'origin'\n";
+            __print__ "=> Submitted changes to remote 'origin'\n";
             __success__
         }
     }
@@ -152,21 +157,21 @@ use Cwd qw(abs_path);
 
         $output  = `git fetch origin 2>&1`;
         if ($?) {
-            warn "Could not synchronize with remote repository, aborting.\n";
+            __warn__ "fatal: Could not synchronize with remote repository\n";
             return __failure__;
         }
         elsif ($output) {
-            print "=> Synchronized new changes\n";
+            __print__ "=> Synchronized new changes\n";
             $changed = 1;
         }
 
         $output = `git merge --ff-only master origin/master 2>&1`;
         if ($?) {
-            warn "Could not merge with remote changes, aborting.\n";
+            __warn__ "fatal: Could not merge with remote changes\n";
             return __failure__;
         }
         elsif ($output !~ /Already up-to-date\./) {
-            print "=> Merged new changes from 'origin'\n";
+            __print__ "=> Merged new changes from 'origin'\n";
             $changed = 1;
         }
 
@@ -174,16 +179,26 @@ use Cwd qw(abs_path);
             autoconfig();
             relink();
 
-            print "=> Update process complete\n";
-            print "=> Please run the following to reload configuration for " .
-                  "any active shell sessions:\n";
-            print "=>\n";
-            print "=>   reshell\n";
+            __print__ "=> Update process complete\n";
+            __print__ "=> Please run the following to reload configuration " .
+                      "for any active shell sessions:\n";
+            __print__ "=>\n";
+            __print__ "=>   reshell\n";
         }
         else {
-            print "=> No new updates\n" unless $changed;
+            __print__ "=> No new updates\n" unless $changed;
         }
         __success__
+    }
+
+    sub __print__($) {
+        return if $__QUIET__;
+        print shift;
+    }
+
+    sub __warn__($) {
+        return if $__QUIET__;
+        warn shift;
     }
 
     sub __chdir__(;$) {
