@@ -104,14 +104,15 @@
     vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
 
 " remap jk to exit insert mode, and leave the cursor where it was before
+" note that this, like any other insert mode mappings, is disabled if you've
+" enabled paste mode
     inoremap jk <C-c>`^
 
-" learn vim the hard way - disable arrow movement and Esc key
+" learn vim the hard way - disable arrow movement
     inoremap <Up>    <NOP>
     inoremap <Down>  <NOP>
     inoremap <Left>  <NOP>
     inoremap <Right> <NOP>
-    inoremap <Esc>   <NOP>
     noremap  <Up>    <NOP>
     noremap  <Down>  <NOP>
     noremap  <Left>  <NOP>
