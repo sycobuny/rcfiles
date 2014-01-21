@@ -95,10 +95,10 @@
         return join(lines, "\n")
     endfunction
 
-" send commands using posgres using shift-r
+" send commands using posgres using <Leader>r
 " idea from Depesz, http://postgr.es/p/1DH
 " slightly modified to dump into register r instead of the buffer
-    vmap R :\|let @r = system('psql -t', VS())<enter>
+    vnoremap <Leader>r :\|let @r = system('psql -t', VS())<enter>
 
 " break lines around a visual selection
     vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
@@ -211,6 +211,9 @@
                 \   )
     au FileType sql call SyntaxRange#Include(
                 \     '  AS \$PERL\$', '  \$PERL\$;', 'perl'
+                \   )
+    au FileType sql call SyntaxRange#Include(
+                \     'DO \$PERL\$', '\$PERL\$ LANGUAGE PLPERL;', 'perl'
                 \   )
 
 " PLUGIN - vim-slime
