@@ -125,7 +125,7 @@ use Cwd qw(abs_path);
             return __die "Will not save without updating";
         }
 
-        my (@untracked) = __git 'ls-untracked';
+        my (@untracked) = grep { /./ } __git 'ls-untracked';
         my ($exit) = sub {
             foreach my $untracked (@untracked) {
                 chomp($untracked);
