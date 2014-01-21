@@ -39,6 +39,9 @@ use Cwd qw(abs_path);
         sub __bad($);
         sub __die($);
 
+        # run this script again as a subcommand
+        sub __exec($);
+
         # switch to the repository directory consistently
         sub __chdir(;$);
     }
@@ -202,8 +205,8 @@ use Cwd qw(abs_path);
         }
 
         if ($changed) {
-            autoconfig();
-            relink();
+            __exec 'autoconfig';
+            __exec 'relink';
 
             __good 'Update process complete';
             __good '';
@@ -238,6 +241,16 @@ use Cwd qw(abs_path);
     sub __die($) {
         __warn "fatal: @{[ shift ]}\n";
         __failure__
+    }
+
+    sub __exec($) {
+        my ($command) = @_;
+        my ($perl)    = $^X; # should work well enough...
+        my ($rcfiles) = $0;
+
+        system($perl, $rcfiles, $command);
+
+        $? >> 8;
     }
 
     sub __chdir(;$) {
