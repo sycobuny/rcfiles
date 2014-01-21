@@ -103,6 +103,9 @@
 " break lines around a visual selection
     vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
 
+" switch into and out of paste mode easily
+    nnoremap <Leader>p :set paste!<Enter>
+
 " remap jk to exit insert mode, and leave the cursor where it was before
 " note that this, like any other insert mode mappings, is disabled if you've
 " enabled paste mode
