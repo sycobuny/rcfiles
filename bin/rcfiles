@@ -39,11 +39,14 @@ use Cwd qw(abs_path);
         sub __bad($);
         sub __die($);
 
+        # run a command with given environmental parameters
+        sub __run($@);
+
         # run this script again as a subcommand
         sub __exec($);
 
-        # switch to the repository directory consistently
-        sub __chdir(;$);
+        # run a git command on the rcfiles repository
+        sub __git(@);
     }
 
     # TODO: make it confirm successes/failures AFTER actions
@@ -69,20 +72,14 @@ use Cwd qw(abs_path);
 
     sub autoconfig {
         my ($changed);
-        my ($cwd) = `pwd`;
-        chomp($cwd);
-
-        __chdir or return __failure__;
 
         while (my ($setting, $value) = each(%settings)) {
-            my ($curval) = `git config $setting` || '';
+            my ($curval) = __git('config', $setting) || '';
             chomp($curval);
 
             if ($curval ne $value) {
                 $changed = 1;
-
-                $ENV{VALUE} = $value;
-                `git config $setting "\$VALUE"`;
+                __git { VALUE => $value }, qq(config $setting "\$VALUE");
 
                 if ($?) { __bad "Could not set $setting to $value" }
                 else    { __good "Set $setting to $value" }
@@ -93,18 +90,12 @@ use Cwd qw(abs_path);
         # the command was successful.
         __good 'Existing configuration is valid' unless $changed;
 
-        # try to go back to the former working directory, and warn people if
-        # we can't
-        __bad "Couldn't return to working directory $cwd" unless chdir($cwd);
-
         # by now, though, we've done everything we were tasked with doing
         __success__
     }
 
     sub status {
-        __chdir or return __failure__;
-
-        `git is-dirty 2>&1 1>/dev/null`;
+        __git 'is-dirty';
         if ($?) {
             __good 'RC Files are locally unmodified';
             __success__
@@ -126,8 +117,7 @@ use Cwd qw(abs_path);
     }
 
     sub diff {
-        __chdir or return __failure__;
-        system(qw(git full-diff)) ? __failure__ : __success__
+        __git({ use_system => 1}, 'full-diff') ? __failure__ : __success__
     }
 
     sub save {
@@ -135,22 +125,22 @@ use Cwd qw(abs_path);
             return __die "Will not save without updating";
         }
 
-        __chdir or return __failure__;
-        my (@untracked) = `git ls-untracked 2>&1`;
+        my (@untracked) = __git 'ls-untracked';
         my ($exit) = sub {
             foreach my $untracked (@untracked) {
                 chomp($untracked);
-                $ENV{TO_REMOVE} = $untracked;
-                `git reset HEAD "\$TO_REMOVE"`;
+                __git { TO_REMOVE => $untracked },
+                      qw(reset HEAD "$TO_REMOVE");
             }
             shift;
         };
 
+        map { chomp } @untracked;
+
         foreach my $untracked (@untracked) {
             chomp($untracked);
 
-            $ENV{TO_ADD} = $untracked;
-            `git add "\$TO_ADD" 2>&1`;
+            __git { TO_ADD => $untracked }, qw(add "$TO_ADD");
 
             if ($?) {
                 __die "Could not add untracked $untracked";
@@ -158,35 +148,32 @@ use Cwd qw(abs_path);
             }
         }
 
-        system(qw(git commit -a));
+        __git { use_system => 1}, qw(commit -a);
         if ($?) {
             __die 'Could not complete commit';
             return $exit->(__failure__);
         }
 
-        `git push 2>&1`;
+        __git 'push';
         if ($?) { __die 'Could not submit updates to remote "origin"' }
         else    { __good 'Submitted changes to remote "origin"'       }
     }
 
     sub reset {
-        __chdir or return __failure__;
-
         if (do { local $__QUIET__ = 1; status() } == __success__) {
             __good 'Nothing to do';
             return __success__;
         }
 
-        `git full-reset`;
+        __git 'full-reset';
         if ($?) { __die 'Could not reset all local modifications' }
         else    { __good 'RC Files have been reset'               }
     }
 
     sub update {
         my ($output, $changed);
-        __chdir or return __failure__;
 
-        $output  = `git fetch origin 2>&1`;
+        $output  = __git qw(fetch origin);
         if ($?) {
             return __die 'Could not synchronize with remote repository';
         }
@@ -195,7 +182,7 @@ use Cwd qw(abs_path);
             $changed = 1;
         }
 
-        $output = `git merge --ff-only master origin/master 2>&1`;
+        $output = __git qw(merge --ff-only master origin/master);
         if ($?) {
             return __die "Could not merge with remote changes";
         }
@@ -243,27 +230,63 @@ use Cwd qw(abs_path);
         __failure__
     }
 
+    sub __run($@) {
+        local ($") = ' ';
+
+        my ($env)     = shift;
+        my (@command) = @_;
+        my ($backup)  = {};
+        my ($unset)   = {};
+        my ($output);
+
+        $env ||= {};
+
+        foreach my $key (keys %$env) {
+            if (exists($ENV{$key})) {
+                $backup->{$key} = $ENV{$key};
+            }
+            else {
+                $unset->{$key} = 1;
+            }
+
+            $ENV{$key} = $env->{$key};
+        }
+
+        if ($env->{use_system}) {
+            $output = system(@command);
+            $? >>= 8;
+        }
+        else {
+            push @command, '2>/dev/null';
+            $output = `@command`;
+        }
+
+        foreach my $key (keys %$backup) { $ENV{$key} = $backup->{$key} }
+        foreach my $key (keys %$unset ) { delete $ENV{$key}            }
+
+        $output;
+    }
+
     sub __exec($) {
         my ($command) = @_;
         my ($perl)    = $^X; # should work well enough...
         my ($rcfiles) = $0;
 
-        system($perl, $rcfiles, $command);
-
-        $? >> 8;
+        __run { use_system => 1 }, $perl, $rcfiles, $command;
+        $?;
     }
 
-    sub __chdir(;$) {
-        my ($nonfatal) = shift;
+    sub __git(@) {
+        my (@command) = @_;
+        my ($env)     = {};
 
-        unless (chdir($ENV{RCDIR})) {
-            my ($errmsg) = "Could not switch to $ENV{RCDIR}";
+        $env = shift(@command) if (ref($command[0]) && $command[0] =~ /HASH/);
+        unshift(@command, 'git');
 
-            $nonfatal ? __bad($errmsg) : __die($errmsg);
-            return;
-        }
+        $env->{GIT_WORK_TREE} ||= $ENV{RCDIR};
+        $env->{GIT_DIR}       ||= catfile($ENV{RCDIR}, '.git');
 
-        return 1;
+        __run $env, @command;
     }
 
     sub __findsub($) {
