@@ -47,10 +47,19 @@ use Cwd qw(abs_path);
 
         # run a git command on the rcfiles repository
         sub __git(@);
+
+        # explain how to use this script, or a single command in it
+        sub __usage(;$);
     }
 
-    # TODO: make it confirm successes/failures AFTER actions
+    # Link all configuration files to the rcfiles copies
+    #
+    # If any given configuration file exists, it is first moved to be the
+    # local verison in the rcfiles repository. Then, a symlink is created so
+    # that this configuration will continue to be used. In this way, any
+    # changes made can be easily reviewed and either committed or discarded.
     sub relink {
+        # TODO: make it confirm successes/failures AFTER actions
         foreach my $symlink (@symlinks) {
             my ($sympath)  = catfile($ENV{HOME}, ".$symlink");
             my ($realpath) = catfile($ENV{RCDIR}, 'configs', $symlink);
@@ -70,6 +79,14 @@ use Cwd qw(abs_path);
         __success__
     }
 
+    # Set up git configuration for the local rcfiles repository
+    #
+    # Certain custom commands and configuration are necessary for the rcfiles
+    # repository to work properly with the rcfiles binary and other commands.
+    # This command will ensure that this configuration exists and is set
+    # properly. Any existing settings that conflict will simply be
+    # overwritten, but it is only local settings, so it should probably be
+    # fine.
     sub autoconfig {
         my ($changed);
 
@@ -94,6 +111,20 @@ use Cwd qw(abs_path);
         __success__
     }
 
+    # Show whether the rcfiles repoository has been locally modified
+    #
+    # If any files have been locally modified, or any untracked files exist,
+    # then this command will tell you.
+    #
+    # Note that the `~/.gitconfig` file has a special case for ignoring only
+    # `[user]` sections, and if you modify these sections, it may report as
+    # modified even if it doesn't show any changes. If `rcfiles diff` does not
+    # show any modifications, it is either this or that certain files have
+    # already been staged. In the latter case, however, you should know this
+    # is the case. In either case, you can tell by running the following
+    # command:
+    #
+    #   (cd $RCDIR && git status)
     sub status {
         __git 'is-dirty';
         if ($?) {
@@ -116,10 +147,22 @@ use Cwd qw(abs_path);
         }
     }
 
+    # Show all local modifications
+    #
+    # Any changes not staged in the index, including untracked files, will be
+    # listed from this command. As per a regular `git diff` command, if the
+    # differences are large enough, the output will be piped into the default
+    # pager.
     sub diff {
         __git({ use_system => 1}, 'full-diff') ? __failure__ : __success__
     }
 
+    # Save all local changes to the remote repository
+    #
+    # Any changes, including untracked files, will be added and committed to
+    # the repository, assuming the commit process is successful (i.e., you
+    # must provide a message in the editor). If this is successful, the
+    # changes will also be pushed to the remote repository.
     sub save {
         if (update() == __failure__) {
             return __die "Will not save without updating";
@@ -159,6 +202,11 @@ use Cwd qw(abs_path);
         else    { __good 'Submitted changes to remote "origin"'       }
     }
 
+    # Revert all local changes
+    #
+    # Any changes that have been made to the local copy of the rcfiles
+    # repository will be completely reverted, including untracked files and
+    # anything that's staged in the index.
     sub reset {
         if (do { local $__QUIET__ = 1; status() } == __success__) {
             __good 'Nothing to do';
@@ -170,6 +218,13 @@ use Cwd qw(abs_path);
         else    { __good 'RC Files have been reset'               }
     }
 
+    # Pull remote changes to the rcfiles repository
+    #
+    # This will attempt to fetch all remote changes and merge them into the
+    # local copy. If this is successful, then it will attempt to re-load the
+    # configuration with the updated changes. However, new shell functions and
+    # configurations cannot be reloaded because the environment cannot be
+    # exported this way. You must run `reshell` afterwards to accomplish this.
     sub update {
         my ($output, $changed);
 
@@ -204,6 +259,18 @@ use Cwd qw(abs_path);
         else {
             __good 'No new updates';
         }
+    }
+
+    # Print help and exit
+    #
+    # This will summarize the usage of the `rcfiles` command. If you provide
+    # an optional command, then additional information will be provided for
+    # that command.
+    sub help {
+        my ($command) = shift;
+        __usage $command;
+
+        __success__
     }
 
     sub __print($) {
@@ -289,6 +356,77 @@ use Cwd qw(abs_path);
         __run $env, @command;
     }
 
+    sub __usage(;$) {
+        my ($command) = shift;
+        my ($pos)     = tell DATA;
+        my ($docs)    = {};
+        my ($comment) = qr/^\s*\# ?(.*)/;
+        my ($sub)     = qr/^\s*sub ([_a-zA-Z][_a-zA-Z0-9]*) \{/;
+        my ($hidden)  = qr/^__/;
+        my ($maxlen)  = 0;
+        my (@contents, @comments);
+        seek DATA, 0, 0;
+
+        @contents = <DATA>;
+
+        foreach my $line (@contents) {
+            chomp $line;
+
+            if ($line =~ $comment) { push @comments, $1 }
+            elsif ($line =~ $sub) {
+                my ($summary, $blank, @description) = @comments;
+                my ($name) = $1;
+
+                @comments = ();
+                next if ($1 =~ $hidden);
+
+                $docs->{$name} = {
+                    summary     => ($summary || ''),
+                    description => \@description,
+                };
+
+                $maxlen = length($name) unless (length($name) <= $maxlen);
+            }
+            else {
+                @comments = ();
+            }
+        }
+
+        seek DATA, 0, $pos;
+
+        if ($command) {
+            if (exists($docs->{$command})) {
+                __good "  rcfiles $command";
+                __good $docs->{$command}{summary};
+                __good (('-=' x 15) . '-');
+
+                foreach my $line (@{ $docs->{$command}{description} }) {
+                    __good $line;
+                }
+            }
+            else {
+                return __die "Unknown command: $command";
+            }
+        }
+        else {
+            __good 'Usage: rcfiles <command>';
+            __good '';
+            __good 'Available commands are:';
+
+            foreach my $command (sort keys %$docs) {
+                my ($summary) = $docs->{$command}{summary};
+                $command = $command . (' ' x ($maxlen - length($command)));
+                __good "  $command - $summary";
+            }
+
+            __good '';
+            __good 'For additional help, try:';
+            __good '  rcfiles help [command]';
+        }
+
+        __failure__
+    }
+
     sub __findsub($) {
         no strict 'refs';
         *{"*@{[ __PACKAGE__ ]}::@{[ shift ]}"}{CODE};
@@ -296,13 +434,16 @@ use Cwd qw(abs_path);
 
     sub __main__ {
         my ($command) = shift;
-        exit __failure__ unless $command;
+        exit __usage unless $command;
 
         my ($subref) = __findsub($command);
-        exit __failure__ unless $subref;
+        exit __usage unless $subref;
 
-        exit($subref->() || __success__);
+        exit($subref->(@_) || __success__);
     }
 }
 
 RCFiles::__main__(@ARGV) if ($0 eq __FILE__);
+
+package RCFiles;
+__DATA__
