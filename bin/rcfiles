@@ -50,6 +50,9 @@ use Cwd qw(abs_path);
 
         # explain how to use this script, or a single command in it
         sub __usage(;$);
+
+        # get a subref from a name
+        sub __findsub($);
     }
 
     # Link all configuration files to the rcfiles copies
