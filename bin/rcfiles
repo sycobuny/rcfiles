@@ -62,7 +62,7 @@ use Cwd qw(abs_path);
     # that this configuration will continue to be used. In this way, any
     # changes made can be easily reviewed and either committed or discarded.
     sub relink {
-        # TODO: make it confirm successes/failures AFTER actions
+        my ($modified) = 0;
         foreach my $symlink (@symlinks) {
             my ($sympath)  = catfile($ENV{HOME}, ".$symlink");
             my ($realpath) = catfile($ENV{RCDIR}, 'configs', $symlink);
@@ -71,13 +71,25 @@ use Cwd qw(abs_path);
             next if ($resolved eq $realpath);
 
             if (-e $resolved) {
-                __good "Moving $resolved to $realpath";
-                rename($resolved, $realpath) if (-e $resolved);
+                if (rename($resolved, $realpath)) {
+                    $modified = 1;
+                    __good "Moved $resolved to $realpath";
+                }
+                else {
+                    return __die "Could not move $resolved to $realpath";
+                }
             }
 
-            __good "Linking $sympath to $realpath";
-            symlink($realpath, $sympath);
+            if (symlink($realpath, $sympath)) {
+                $modified = 1;
+                __good "Linked $sympath to $realpath";
+            }
+            else {
+                return __die "Could not link $sympath to $realpath";
+            }
         }
+
+        __good('Existing files are properly linked') unless $modified;
 
         __success__
     }
