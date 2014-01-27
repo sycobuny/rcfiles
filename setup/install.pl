@@ -145,12 +145,5 @@ switch_to_repository();
 # load the command line library
 load_library();
 
-# re-link all the configuration files to point into our system
-RCFiles::relink();
-
-# set up the local git configuration, currently, this:
-#   * adds a `git full-diff` alias for diffing even untracked files
-#   * adds a `git ls-untracked` alias for easily getting all untracked files
-#   * adds a `git is-dirty` alias for easily checking if changes exist
-#   * sets a filter on ~/.gitconfig to ignore [user] sections
+# set up local repository configuration
 RCFiles::autoconfig();

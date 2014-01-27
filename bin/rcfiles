@@ -102,7 +102,7 @@ use Cwd qw(abs_path);
     # properly. Any existing settings that conflict will simply be
     # overwritten, but it is only local settings, so it should probably be
     # fine.
-    sub autoconfig {
+    sub gitconfig {
         my ($changed);
 
         while (my ($setting, $value) = each(%settings)) {
@@ -124,6 +124,26 @@ use Cwd qw(abs_path);
 
         # by now, though, we've done everything we were tasked with doing
         __success__
+    }
+
+    # Run all post-install/update configurations
+    #
+    # After updates or installation, or just in case you've made some local
+    # home directory changes outside of the repo that you want to ensure
+    # haven't messed anything up, this command will run through the various
+    # self-configuration steps and run them all. Each command is run
+    # independent of the others, so you may get a fatal error in one but the
+    # next will execute properly.
+    #
+    # The exit status of this command, however, is success if all
+    # configurations succeed, and failure if any of them does not.
+    sub autoconfig {
+        my ($status) = __success__;
+
+        $status = __failure__ if (relink    == __failure__);
+        $status = __failure__ if (gitconfig == __failure__);
+
+        $status
     }
 
     # Show whether the rcfiles repoository has been locally modified
@@ -263,7 +283,6 @@ use Cwd qw(abs_path);
 
         if ($changed) {
             __exec 'autoconfig';
-            __exec 'relink';
 
             __good 'Update process complete';
             __good '';
