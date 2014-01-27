@@ -25,6 +25,9 @@
         endif
     endif
 
+" reload the ~/.vimrc file
+    nnoremap <Leader>rc :source $MYVIMRC<cr>
+
 " search preferences - boosted from stevelosh
     " use pcre-ish instead of vim-ish regex
     nnoremap / /\v
