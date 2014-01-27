@@ -156,8 +156,9 @@ use Cwd qw(abs_path);
     # modified even if it doesn't show any changes. If `rcfiles diff` does not
     # show any modifications, it is either this or that certain files have
     # already been staged. In the latter case, however, you should know this
-    # is the case. In either case, you can tell by running the following
-    # command:
+    # is why that's happened, cause there's no facility to do this in
+    # `rcfiles`; you'd have to have edited the files yourself. In either
+    # situtation, you can tell by running the following command:
     #
     #   (cd $RCDIR && git status)
     sub status {
