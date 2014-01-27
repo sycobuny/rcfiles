@@ -29,14 +29,9 @@
     nnoremap <Leader>rc :source $MYVIMRC<cr>
 
 " search preferences - boosted from stevelosh
-    " use pcre-ish instead of vim-ish regex
-    nnoremap / /\v
-    vnoremap / /\v
     " search case-insensitive by default (unless we use uppercase)
     set ignorecase
     set smartcase
-    " replace globally by default
-    set gdefault
     " highlight searches while typing
     set incsearch
     set showmatch
