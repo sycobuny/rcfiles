@@ -4,14 +4,17 @@ use warnings;
 use strict;
 
 use File::Spec::Functions;
-use Cwd qw(abs_path);
+use File::Path qw(make_path);
+use Cwd        qw(abs_path);
 
 { package RCFiles;
     # import subs we just loaded from the main namespace
-    *abs_path = *::abs_path;
-    *catfile  = *::catfile;
+    *catfile   = *::catfile;
+    *make_path = *::make_path;
+    *abs_path  = *::abs_path;
 
     our ($__QUIET__) = 0;
+    our (@histories) = qw(bash mysql psql zsh);
     our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
     our (%settings)  = (
         'alias.full-diff'         => '!$(git root)/setup/git-full-diff.sh',
@@ -94,6 +97,90 @@ use Cwd qw(abs_path);
         __success__
     }
 
+    # Move and merge history files into $HOME/.history
+    #
+    # To help keep `$HOME` clean, any given history file is moved to a
+    # `$HOME/.history` subdirectory. This function will create the
+    # `$HOME/.history` directory and then try to move any existing history
+    # files from `$HOME` to that directory. If both locations exist, the files
+    # will be merged, with the file with the oldest "last modified" timestamp
+    # appearing first. After that, any files remaining in `$HOME` will be
+    # removed.
+    sub mergehist {
+        my ($modified) = 0;
+        my ($histdir)  = catfile($ENV{HOME}, '.history');
+        unless (-d $histdir) {
+            make_path($histdir);
+
+            if (-d $histdir) {
+                $modified = 1;
+                __good "Created history directory $histdir";
+            }
+            else {
+                return __die "Could not create history directory $histdir";
+            }
+        }
+
+        foreach my $history (@histories) {
+            my ($original) = catfile($ENV{HOME}, ".${history}_history");
+            my ($moved)    = catfile($histdir,   $history);
+
+            if ((-s $original) && (-s $moved)) {
+                local ($/) = undef;
+                my (@files) = sort { ((stat($a))[9] <=> (stat($b))[9]) }
+                              ($original, $moved);
+                my (@contents);
+
+                foreach my $file (@files) {
+                    open(my ($fh), '<', $file)
+                        or return __die "Couldn't read $file: $!";
+                    push(@contents, <$fh>);
+                    close($fh) or __bad "Couldn't close $file: $!";
+                }
+
+                open(my ($fh), '>', $moved)
+                    or return __die "Couldn't open $moved for writing: $!";
+                $fh->print(join("\n", @contents));
+                close($fh) or return __die "Couldn't write $moved: $!\n";
+
+                __good "Merged $original and $moved";
+            }
+            elsif (-s $original) {
+                if (rename($original, $moved)) {
+                    $modified = 1;
+                    __good "Moved $original to $moved";
+                }
+                else {
+                    return __die "Could not move $original to $moved";
+                }
+            }
+            elsif (!-e $moved) {
+                __run { FN => $moved }, qw(touch "$FN");
+                if ($?) {
+                    return __die "Could not create file $moved";
+                }
+                else {
+                    $modified = 1;
+                    __good "Created file $moved";
+                }
+            }
+
+            if (-e $original) {
+                if (unlink($original)) {
+                    $modified = 1;
+                    __good "Removed file $original";
+                }
+                else {
+                    return __die "Could not remove file $original";
+                }
+            }
+        }
+
+        __good('Existing history files are properly merged') unless $modified;
+
+        __success__;
+    }
+
     # Set up git configuration for the local rcfiles repository
     #
     # Certain custom commands and configuration are necessary for the rcfiles
@@ -141,6 +228,7 @@ use Cwd qw(abs_path);
         my ($status) = __success__;
 
         $status = __failure__ if (relink    == __failure__);
+        $status = __failure__ if (mergehist == __failure__);
         $status = __failure__ if (gitconfig == __failure__);
 
         $status
