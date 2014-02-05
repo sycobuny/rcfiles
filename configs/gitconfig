@@ -21,3 +21,5 @@
     dir  = rev-parse --git-dir
 [push]
     default = simple
+[status]
+    showUntrackedFiles = all
