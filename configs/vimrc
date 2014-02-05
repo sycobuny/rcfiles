@@ -76,7 +76,8 @@
     set textwidth=78
 
     " add specific filenames not detected (yet) by any of my plugins
-    au BufNewFile,BufRead Vagrantfile,Gemfile set ft=ruby
+    au BufNewFile,BufRead Vagrantfile,Gemfile   set ft=ruby
+    au BufNewFile,BufRead *.spreadsheet,*.prawn set ft=ruby
 
     " fix special case textwidth for git commit messages (fugitive auto-sets
     " this, but me setting the colorcolumn and textwidth manually breaks that)
