@@ -16,6 +16,7 @@ use Cwd        qw(abs_path);
     our ($__QUIET__) = 0;
     our (@histories) = qw(bash mysql psql zsh);
     our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
+    our (@unsets)    = qw(alias.full-diff);
     our (%settings)  = (
         'alias.ls-untracked'      => 'ls-files -o --exclude-standard',
         'alias.full-reset'        =>
@@ -190,6 +191,19 @@ use Cwd        qw(abs_path);
     # fine.
     sub gitconfig {
         my ($changed);
+
+        foreach my $setting (@unsets) {
+            __git { SETTING => $setting }, qw(config --local "$SETTING");
+
+            unless ($?) {
+                $changed = 1;
+                __git { SETTING => $setting },
+                      qw(config --local --unset-all "$SETTING");
+
+                if ($?) { __bad "Could not unset $setting" }
+                else    { __good "Unset $setting"          }
+            }
+        }
 
         while (my ($setting, $value) = each(%settings)) {
             my ($curval) = __git('config', $setting) || '';
