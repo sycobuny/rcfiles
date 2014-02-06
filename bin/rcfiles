@@ -17,7 +17,6 @@ use Cwd        qw(abs_path);
     our (@histories) = qw(bash mysql psql zsh);
     our (@symlinks)  = qw(bashrc gitconfig psqlrc tmux.conf vimrc zshrc);
     our (%settings)  = (
-        'alias.full-diff'         => '!$(git root)/setup/git-full-diff.sh',
         'alias.ls-untracked'      => 'ls-files -o --exclude-standard',
         'alias.full-reset'        =>
             '!git reset --hard HEAD && git clean -fx',
@@ -278,7 +277,19 @@ use Cwd        qw(abs_path);
     # differences are large enough, the output will be piped into the default
     # pager.
     sub diff {
-        __git({ use_system => 1}, 'full-diff') ? __failure__ : __success__
+        my ($changed);
+        get_status: {
+            local $__QUIET__ = 1;
+            $changed = status;
+        }
+
+        if ($changed) {
+            __git { use_system => 1}, 'full-diff';
+            $?
+        }
+        else {
+            __bad 'No changes'
+        }
     }
 
     # Save all local changes to the remote repository

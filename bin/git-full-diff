@@ -1,0 +1,63 @@
+#!/bin/zsh
+
+# this script is courtesy of Jo Liss (@joliss on GitHub, @jo_liss on Twitter):
+#   http://stackoverflow.com/a/4864668/302012
+# modified into a function for use in ~/.gitconfig
+
+function full-diff() {
+    if [ "$#" = 0 ]; then
+        local color
+        local new
+        local diff_files
+        local new_files
+
+        typeset -A diff_files
+        typeset -A new_files
+
+        for file in $(git ls-files --others --exclude-standard); do
+            if [ -r "$file" ]; then
+                if [ -s "$file" ]; then
+                    diff_files+="$file"
+                else
+                    new_files+="$file"
+                fi
+            fi
+        done
+
+        git config --get-colorbool color.diff.new
+        if [ $? = 0 ]; then
+            new=$(git config --get-color color.diff.new 'green')
+        else
+            new=''
+        fi
+
+        git config --get-colorbool color.diff
+        if [ $? = 0 ]; then
+            color='--color'
+        else
+            color=''
+        fi
+
+        [ -n "$(git config core.pager)" ] && PAGER=$(git config core.pager)
+
+        (
+            git diff $color
+            for diff_file in $diff_files; do
+                git diff $color -- /dev/null "$diff_file"
+            done
+
+            if [ ${#new_files} -gt 0 ]; then
+                echo ''
+                echo ">>> New Empty Files"
+
+                for new_file in $new_files; do
+                    echo "  $new'$new_file'"
+                done
+            fi
+        ) | $PAGER
+    else
+        git diff "$@"
+    fi
+}
+
+full-diff

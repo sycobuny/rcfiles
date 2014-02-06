@@ -19,6 +19,9 @@
     # directory for the repo (in case we're in a bare repo)
     root = rev-parse --show-toplevel
     dir  = rev-parse --git-dir
+
+    # do a full diff, including new/untracked files
+    full-diff = !git-full-diff
 [push]
     default = simple
 [status]
