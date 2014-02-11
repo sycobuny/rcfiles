@@ -302,7 +302,7 @@ use Cwd        qw(abs_path);
             $?
         }
         else {
-            __bad 'No changes'
+            __die 'No changes'
         }
     }
 
