@@ -65,10 +65,13 @@
     set       t_Co=256 " 256-color terminal
     syntax    enable   " enable highlighting
 
-    " add overflow column warning coloring
+    " add overflow column warning coloring - if we can. either we'll use the
+    " very nice colorcolumn var provided in 7.3, or matchadd which was
+    " introduced in 7.1 in later patches and solidly exists in 7.2. if neither
+    " exists, we just don't bother.
     if exists('+colorcolumn')
         set colorcolumn=79
-    else
+    elseif exists('*matchadd')
         au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
     endif
 
@@ -195,17 +198,24 @@
     au FileType puppet set tabstop=2
 
 " PLUGIN - vim-indent-guides
-    Bundle "nathanaelkane/vim-indent-guides"
-    " prevent errors from cropping up
-    hi Normal ctermbg=black
-    let g:indent_guides_start_level = 2 " no clue
-    let g:indent_guides_guide_size  = 1 " no fat guides
-    let g:indent_guides_auto_colors = 0 " skip auto-color decisions
-    " make some pretty colors
-    au VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
-    au VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
-    " turn it on by default
-    au VimEnter * :IndentGuidesEnable
+    " NOTES
+    "     This plugin uses matchadd() all over the place and causes tons of
+    "     errors if it doesn't exist, so we'll check for it before trying to
+    "     turn any of this on, since vim older than 7.2 isn't guaranteed to
+    "     have it.
+    if exists('*matchadd')
+        Bundle "nathanaelkane/vim-indent-guides"
+        " prevent errors from cropping up
+        hi Normal ctermbg=black
+        let g:indent_guides_start_level = 2 " no clue
+        let g:indent_guides_guide_size  = 1 " no fat guides
+        let g:indent_guides_auto_colors = 0 " skip auto-color decisions
+        " make some pretty colors
+        au VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
+        au VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
+        " turn it on by default
+        au VimEnter * :IndentGuidesEnable
+    endif
 
 " PLUGIN - SyntaxRange
     Bundle "SyntaxRange"
