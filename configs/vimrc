@@ -217,6 +217,9 @@
         au VimEnter * :IndentGuidesEnable
     endif
 
+" PLUGIN - vim-signature
+    Bundle "kshenoy/vim-signature"
+
 " PLUGIN - SyntaxRange
     Bundle "SyntaxRange"
     au FileType vim call SyntaxRange#Include(
