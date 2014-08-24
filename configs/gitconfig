@@ -22,6 +22,10 @@
 
     # do a full diff, including new/untracked files
     full-diff = !git-full-diff
+
+    # force a merge on a commit - useful if the commit being merged is earlier
+    # in the same branch (git will usually complain about this)
+    force-merge = !git-force-merge
 [push]
     default = simple
 [status]

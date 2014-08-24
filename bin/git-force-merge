@@ -1,0 +1,93 @@
+#!/bin/zsh
+
+function force-merge() {
+    if [ "$#" = 0 ]; then
+        echo "fatal: Must be provided with an SHA to merge" >&2
+        exit 1
+    fi
+
+    shatype=$(git cat-file -t $1)
+
+    if [ "$shatype" != 'commit' ]; then
+        echo "fatal: Provided SHA must point to a commit" >&2
+        exit 1
+    fi
+
+    editmsg="$(git rev-parse --git-dir)/COMMIT_EDITMSG"
+
+    # print the standard git commit message header
+    ln1="# Please enter the commit message for your changes. Lines starting"
+    ln2="# with '#' will be ignored, and an empty message aborts the commit."
+    echo ""     >  "$editmsg"
+    echo "$ln1" >> "$editmsg"
+    echo "$ln2" >> "$editmsg"
+    echo "# "   >> "$editmsg"
+
+    # first things first - show the commit we're merging in
+    echo "# Forcing merge of the following commit:"  >> "$editmsg"
+    (git show --stat "$1" | perl -pe 'print "# @F"') >> "$editmsg"
+    echo "# "                                        >> "$editmsg"
+
+    # then, show either the status of the working copy, presuming we've added
+    # files to be committed, or the most recent commit, which is the one we're
+    # merging (like a standard branch merge would happen). the latter is not
+    # usually how I use this command, but maybe I will someday.
+    if [ $(git diff --stat --cached HEAD | wc -l) != 0 ]; then
+        echo "# Current status of working copy:" >> "$editmsg"
+        (git status | perl -pe 'print "# @F"') >> "$editmsg"
+    else
+        echo "# Current HEAD (the other commit being merged):" >> "$editmsg"
+        (git show --stat HEAD | perl -pe 'print "# @F"')       >> "$editmsg"
+    fi
+
+    # fire up that $EDITOR and let's get a message!
+    ed=${EDITOR:-vi}
+    $ed "$editmsg"
+
+    # if the editor command fails, we know *something* is wrong, so we abort.
+    # however, like a good git command, we leave COMMIT_EDITMSG as the user
+    # (probably) last saw it
+    if [ $? != 0 ]; then
+        echo "fatal: Problem with editor $ed, could not complete process" >&2
+        exit 1
+    fi
+
+    # I'm not sure whether `git commit-tree` parses out comments, so to be on
+    # the safe side, we do that here through an intermediary.
+    cleanmsg="$(git rev-parse --git-dir)/COMMIT_CLEAN"
+    (cat "$editmsg" | grep -ve '^#') > "$cleanmsg"
+
+    # Check to see if there's any commit message there after we strip
+    # comments. Like earlier, `git commit-tree` *may* do this for us, but it's
+    # safer to assume nothing.
+    grep -e '[^[:blank:]]' "$cleanmsg"
+    if [ $? != 0 ]; then
+        echo "Aborting commit due to empty commit message." >&2
+        rm "$cleanmsg"
+        exit 1
+    fi
+
+    # save some SHAs we'll need in a moment.
+    index=$(git write-tree)
+    head=$(git rev-parse HEAD)
+
+    # Finally, we'll try to commit the merge commit, and then push our HEAD up
+    # to that. We save the result because we're going to rm the "$cleanmsg"
+    # file regardless of the outcome, and don't want to clobber it.
+    git merge $(git commit-tree "$index" -p "$head" -p "$1" < "$cleanmsg")
+    res=$?
+
+    # as promised, remove the intermediary file.
+    rm "$cleanmsg"
+
+    # if we had a problem doing the commit, let the user know and fail,
+    # otherwise exit cleanly; we're done.
+    if [ "$res" != 0 ]; then
+        echo "fatal: Error completing merge process" >&2
+        exit 1
+    else
+        exit 0
+    fi
+}
+
+force-merge "$@"
