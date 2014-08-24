@@ -60,4 +60,4 @@ function full-diff() {
     fi
 }
 
-full-diff
+full-diff "$@"
