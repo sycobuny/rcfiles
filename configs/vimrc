@@ -50,6 +50,12 @@
 " reload the ~/.vimrc file
     nnoremap <Leader>rc :source $MYVIMRC<cr>
 
+" save current work to a remote WIP branch
+    nnoremap <Leader><C-s> :Git wip<CR>
+
+" load remote WIP branch into current working copy
+    nnoremap <Leader><C-l> :Git wip-restore<CR>
+
 " search preferences - boosted from stevelosh
     " search case-insensitive by default (unless we use uppercase)
     set ignorecase

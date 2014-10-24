@@ -4,6 +4,9 @@
     editor = /usr/bin/vim
 [color]
     ui = auto
+[wip]
+    remote = origin
+    branch = wip
 [alias]
     # the way I prefer to see logs - with a colorful graph
     lg = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)-- %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
@@ -20,12 +23,21 @@
     root = rev-parse --show-toplevel
     dir  = rev-parse --git-dir
 
+    # a shortcut to get the current branch name
+    current-branch = rev-parse --abbrev-ref HEAD
+
     # do a full diff, including new/untracked files
     full-diff = !git-full-diff
 
     # force a merge on a commit - useful if the commit being merged is earlier
     # in the same branch (git will usually complain about this)
     force-merge = !git-force-merge
+
+    # commit work in progress and push to a remote work-in-progress branch
+    wip = !(cd $(git root) && git add .) && git commit -m 'WIP' && git push --force $(git config wip.remote) $(git current-branch):$(git config wip.branch)
+
+    # pull work from a work-in-progress branch and soft-apply it to the repo
+    wip-restore = !git fetch $(git config wip.remote) $(git config wip.branch) && git merge --ff-only $(git config wip.remote)/$(git config wip.branch) && git reset HEAD~
 [push]
     default = simple
 [status]

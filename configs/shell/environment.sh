@@ -28,6 +28,10 @@ if [ -s "$RVM_ROOT/scripts/rvm" ]; then
     export PATH=$PATH:$RVM_ROOT/bin
 fi
 
+# disable XON/XOFF flow control - I never use this, and it mucks about with
+# using ^S in mappings: see http://unix.stackexchange.com/a/72092
+stty -ixon
+
 # make sure to use an editor and a pager I'm familiar with
 export EDITOR='vim'
 export PAGER='less'
