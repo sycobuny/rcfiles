@@ -6,6 +6,11 @@ rcbin=$RCDIR/bin
 [[ :$PATH: == *:"$rcbin":* ]] || PATH=$PATH:$rcbin
 unset rcbin
 
+# add a secondary site-specific bin
+altrcbin=$RCDIR/site/bin
+[[ :$PATH: == *:"$altrcbin":* ]] || PATH=$PATH:$altrcbin
+unset altrcbin
+
 # mac-only configurations
 if [ $(uname -a | grep Darwin | wc -l) -ne 0 ]; then
     source $RCDIR/configs/shell/environment-mac.sh
