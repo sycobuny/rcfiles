@@ -1,5 +1,16 @@
-" allow for project-local vim configurations
+" loading and writing sessions
+    function! LoadSession(sesspath)
+        exe 'source ' . a:sesspath
+    endfunction
+
+    function! WriteSession(sesspath)
+        exe 'mksession! ' . a:sesspath
+    endfunction
+
+" use this for project-specific configurations/sessions
     let s:gitroot = system('git root')
+
+" allow for project-local vim configurations
     if s:gitroot !=# ''
         let s:gitvimconfig = s:gitroot[0:-2] . "/.git/vimrc"
         if filereadable(s:gitvimconfig)
@@ -10,6 +21,17 @@
         if filereadable(s:projvimconfig)
             exec "source " . s:projvimconfig
         endif
+    endif
+
+" write and load project-specific sessions automatically
+    if s:gitroot !=# ''
+        let s:gitvimsession = s:gitroot[0:-2] . "/.git/vimsession"
+        if filereadable(s:gitvimsession) && argc() == 0
+            au VimEnter * :call LoadSession(s:gitvimsession)
+        endif
+
+        au VimLeave * :call WriteSession(s:gitvimsession)
+        au BufWrite * :call WriteSession(s:gitvimsession)
     endif
 
 " allow for directory-local vim configurations as well
