@@ -38,6 +38,9 @@
 
     # pull work from a work-in-progress branch and soft-apply it to the repo
     wip-restore = !git fetch $(git config wip.remote) $(git config wip.branch) && git merge --ff-only $(git config wip.remote)/$(git config wip.branch) && git reset HEAD~
+
+    # get the historically-first commit's hash
+    first-commit = !git log --pretty=oneline | tail -n1 | cut -d\\  -f1
 [push]
     default = simple
 [status]
