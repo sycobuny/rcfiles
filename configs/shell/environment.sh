@@ -41,3 +41,8 @@ export LANG='en_US.UTF-8'
 
 # change history file for MySQL
 export MYSQL_HISTFILE=$HOME/.history/mysql
+
+# load site-specific env settings either the root of this repository's
+# site/environment file (ignored by git) or in ~/.site_environment (or both!)
+[ -s $RCDIR/site/environment.sh ] && source $RCDIR/site/environment.sh
+[ -s $HOME/.site_environment    ] && source $HOME/.site_environment
