@@ -16,16 +16,61 @@ if [ $(uname -a | grep Darwin | wc -l) -ne 0 ]; then
     source $RCDIR/configs/shell/environment-mac.sh
 fi
 
-# perlbrew
-export PERL5LIB=$HOME/.perl5/lib
+# perl versioning - plenv is preferred, if not, maybe perlbrew is still around
+# note that perlbrew and plenv do not play together. they have inherited their
+# mutual dislike from the ruby projects they count as ancestors. if you have
+# what appears to be a perlbrew path when plenv is in play, you get a warning.
+export PLENV_ROOT=$HOME/.plenv
 export PERLBREW_ROOT=$HOME/.perl5/perlbrew
-[ -s $PERLBREW_ROOT/etc/bashrc ] && source $PERLBREW_ROOT/etc/bashrc
+if [ -d "$PLENV_ROOT" ]; then
+    export PATH="$PLENV_ROOT/bin:$PATH"
+    eval "$(plenv init -)"
 
-# rvm
+    if [ -d "$PERLBREW_ROOT" ]; then
+        echo 'RVM appears to be present on same system as rbenv.'
+        echo 'THIS IS A BAD IDEA.'
+        echo 'You should uninstall one of these systems.'
+    fi
+else
+    unset PLENV_ROOT
+
+    if [ -s "$PERLBREW_ROOT/etc/bashrc" ]; then
+        # finalize our setup
+        export PERL5LIB=$HOME/.perl5/lib
+        source $PERLBREW_ROOT/etc/bashrc
+    else
+        unset PERLBREW_ROOT
+    fi
+fi
+
+# ruby versioning - rbenv is preferred, if not, then maybe RVM is still around
+# note that rbenv and RVM do not play together at all, so we don't try to
+# initialize both, even if both are installed. in fact, having rbenv with RVM
+# generates a warning on every login.
+export RBENV_ROOT=$HOME/.rbenv
 export RVM_ROOT=$HOME/.rvm
-if [ -s "$RVM_ROOT/scripts/rvm" ]; then
-    source $RVM_ROOT/scripts/rvm
-    export PATH=$PATH:$RVM_ROOT/bin
+if [ -d "$RBENV_ROOT" ]; then
+    export PATH="$RBENV_ROOT/bin:$PATH"
+    eval "$(rbenv init -)"
+
+    if [ -d "$RVM_ROOT" ]; then
+        echo 'RVM appears to be present on same system as rbenv.'
+        echo 'THIS IS A BAD IDEA.'
+        echo 'You should uninstall one of these systems.'
+    fi
+
+    # we don't actually need this var
+    unset RVM_ROOT
+else
+    # this isn't of use to us
+    unset RBENV_ROOT
+
+    if [ -s "$RVM_ROOT/scripts/rvm" ]; then
+        source $RVM_ROOT/scripts/rvm
+        export PATH=$PATH:$RVM_ROOT/bin
+    else
+        unset RVM_ROOT
+    fi
 fi
 
 # disable XON/XOFF flow control - I never use this, and it mucks about with
