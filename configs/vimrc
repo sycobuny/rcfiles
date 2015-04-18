@@ -1,55 +1,11 @@
 " initialize our vimrc loader
 execute 'source ' . $RCDIR . '/configs/vim/init.vim'
+
+" load in our various script files to construct our particular set of
+" settings.
+call g:myVim.LoadScript('directory-vimrc')
+call g:myVim.LoadScript('projects')
 call g:myVim.LoadScript('mappings')
-
-" loading and writing sessions
-    function! LoadSession(sesspath)
-        exe 'source ' . a:sesspath
-    endfunction
-
-    function! WriteSession(sesspath)
-        exe 'mksession! ' . a:sesspath
-    endfunction
-
-" use this for project-specific configurations/sessions
-    let s:gitroot = system('git root')
-
-" allow for project-local vim configurations
-    if s:gitroot !=# ''
-        let s:gitvimconfig = s:gitroot[0:-2] . "/.git/vimrc"
-        if filereadable(s:gitvimconfig)
-            exec "source " . s:gitvimconfig
-        endif
-
-        let s:projvimconfig = s:gitroot[0:-2] . "/.vimrc"
-        if filereadable(s:projvimconfig)
-            exec "source " . s:projvimconfig
-        endif
-    endif
-
-" write and load project-specific sessions automatically
-    if s:gitroot !=# ''
-        let s:gitvimsession = s:gitroot[0:-2] . "/.git/vimsession"
-        if filereadable(s:gitvimsession) && argc() == 0
-            au VimEnter * :call LoadSession(s:gitvimsession)
-        endif
-
-        au VimLeave * :call WriteSession(s:gitvimsession)
-        au BufWrite * :call WriteSession(s:gitvimsession)
-    endif
-
-" allow for directory-local vim configurations as well
-    let s:cwd = system('pwd')
-    if s:cwd !=# '' && s:cwd[0:-2] !=# $HOME
-        " make sure we don't re-run a .vimrc if we're opening in a git
-        " project's root directory
-        if s:cwd !=# s:gitroot
-            let s:cwdvimconfig = s:cwd[0:-2] . "/.vimrc"
-            if filereadable(s:cwdvimconfig)
-                exec "source " . s:cwdvimconfig
-            endif
-        endif
-    endif
 
 " search preferences - boosted from stevelosh
     " search case-insensitive by default (unless we use uppercase)
