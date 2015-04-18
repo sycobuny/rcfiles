@@ -29,10 +29,15 @@ if !exists('g:myVim')
         let l:script = g:myVim.dir . a:script . '.vim'
         let l:load   = 'source ' . l:script
 
+        " save that we're trying to load this script. we can theoretically
+        " view this with :scriptnames, but this is limited to custom ~/.vimrc
+        " loaded scripts called with this function, so it's more narrow in
+        " focus. we can use it to quickly make sure we're loading everything
+        " in '$RCDIR/configs/vim/'
+        call add(g:myVim.scripts, l:script)
+
         " load the script file (this has to be done via 'execute' because
         " 'source' takes its arguments as a literal
         execute l:load
-
-        call add(g:myVim.scripts, l:script)
     endfunction
 endif
