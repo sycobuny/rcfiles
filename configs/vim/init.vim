@@ -13,18 +13,18 @@ if !exists('g:myVim')
     let g:myVim.scripts = [expand('<sfile>:h:p')]
 
     " a function to wipe our current settings
-    function! g:myVim.EraseSettings()
+    function g:myVim.EraseSettings()
         unlet g:myVim
     endfunction
 
     " a function to force-reload all of ~/.vimrc, including this file
-    function! g:myVim.Reload()
+    function g:myVim.Reload()
         call g:myVim.EraseSettings()
         source $MYVIMRC
     endfunction
 
     " a function to load additional script files in this directory
-    function! g:myVim.LoadScript(script)
+    function g:myVim.LoadScript(script)
         " construct the path to the script, and an eval string to load it
         let l:script = g:myVim.dir . a:script . '.vim'
         let l:load   = 'source ' . l:script
