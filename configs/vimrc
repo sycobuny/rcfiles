@@ -1,3 +1,7 @@
+" initialize our vimrc loader
+execute 'source ' . $RCDIR . '/configs/vim/init.vim'
+call g:myVim.LoadScript('mappings')
+
 " loading and writing sessions
     function! LoadSession(sesspath)
         exe 'source ' . a:sesspath
@@ -47,15 +51,6 @@
         endif
     endif
 
-" reload the ~/.vimrc file
-    nnoremap <Leader>rc :source $MYVIMRC<cr>
-
-" save current work to a remote WIP branch
-    nnoremap <Leader><C-s> :Git wip<CR>
-
-" load remote WIP branch into current working copy
-    nnoremap <Leader><C-l> :Git wip-restore<CR>
-
 " search preferences - boosted from stevelosh
     " search case-insensitive by default (unless we use uppercase)
     set ignorecase
@@ -65,8 +60,6 @@
     set showmatch
     set hlsearch
     set smarttab
-    " clear highlights quickly
-    nnoremap <Leader><Space> :noh<cr>
 
 " filesystem management
     set nowb       " do not create filename~ backups
@@ -80,13 +73,6 @@
     set expandtab    " expand tabs to spaces when I push the tab key
     set nopaste      " do not assume paste mode by default
     set backspace=indent,eol,start " allow backspacing over indents/etc.
-
-" remap ]], [[, [], and ][ to find block encoding without C-style
-    " Yoinked from vim help, see :help object-motions
-    map [[ ?{<CR>w99[{
-    map ][ /}<CR>b00]}
-    map ]] j0[[%/{<CR>
-    map [] k$][%?}<CR>
 
 " syntax highlighting
     " first off, turn it on
@@ -129,32 +115,6 @@
         let lines[0] = lines[0][col1 - 1:]
         return join(lines, "\n")
     endfunction
-
-" send commands using posgres using <Leader>r
-" idea from Depesz, http://postgr.es/p/1DH
-" slightly modified to dump into register r instead of the buffer
-    vnoremap <Leader>r :\|let @r = system('psql -t', VS())<enter>
-
-" break lines around a visual selection
-    vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
-
-" switch into and out of paste mode easily
-    nnoremap <Leader>p :set paste!<Enter>
-
-" remap jk to exit insert mode, and leave the cursor where it was before
-" note that this, like any other insert mode mappings, is disabled if you've
-" enabled paste mode
-    inoremap jk <C-c>`^
-
-" learn vim the hard way - disable arrow movement
-    inoremap <Up>    <NOP>
-    inoremap <Down>  <NOP>
-    inoremap <Left>  <NOP>
-    inoremap <Right> <NOP>
-    noremap  <Up>    <NOP>
-    noremap  <Down>  <NOP>
-    noremap  <Left>  <NOP>
-    noremap  <Right> <NOP>
 
 " turn on spell-checking in markdown, plaintext files, and git commits; turn
 " it off specifically for help files (which is a subset of plaintext files)
