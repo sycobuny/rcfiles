@@ -55,9 +55,9 @@ vnoremap <Leader>r :\|let @r = system('psql -t', VS())<enter>
 " \i - break lines around a visual selection
 vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
 
-""""""""""""""""""""""""""""""""
-" POLY MODE (NORMAL/VISUAL/O???)
-""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""
+" POLY MODE (NORMAL/VISUAL/OPERATOR-PENDING)
+""""""""""""""""""""""""""""""""""""""""""""
 
 " learn vim the hard way - disable arrow movement
 noremap  <Up>    <NOP>
