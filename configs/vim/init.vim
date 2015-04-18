@@ -23,17 +23,31 @@ if !exists('g:myVim')
         source $MYVIMRC
     endfunction
 
+    function g:myVim.FullScriptPath(script)
+        return g:myVim.dir . a:script . '.vim'
+    endfunction
+
+    function g:myVim.ScriptIsLoaded(script)
+        return index(g:myVim.scripts, g:myVim.FullScriptPath(a:script)) >= 0
+    endfunction
+
     " a function to load additional script files in this directory
     function g:myVim.LoadScript(script)
+        " check if the script has already been loaded
+        if g:myVim.ScriptIsLoaded(a:script)
+            return
+        end
+
         " construct the path to the script, and an eval string to load it
-        let l:script = g:myVim.dir . a:script . '.vim'
+        let l:script = g:myVim.FullScriptPath(a:script)
         let l:load   = 'source ' . l:script
 
         " save that we're trying to load this script. we can theoretically
         " view this with :scriptnames, but this is limited to custom ~/.vimrc
         " loaded scripts called with this function, so it's more narrow in
         " focus. we can use it to quickly make sure we're loading everything
-        " in '$RCDIR/configs/vim/'
+        " in '$RCDIR/configs/vim/' - it also allows us to prevent loading the
+        " same file twice
         call add(g:myVim.scripts, l:script)
 
         " load the script file (this has to be done via 'execute' because
