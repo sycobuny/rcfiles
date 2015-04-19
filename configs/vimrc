@@ -10,17 +10,6 @@ call g:myVim.LoadScript('settings')
 call g:myVim.LoadScript('filetypes')
 call g:myVim.LoadScript('vundle')
 
-" grab the contents of the visual selection
-" thanks to http://stackoverflow.com/a/6271254
-    function! VS()
-        let [lnum1, col1] = getpos("'<")[1:2]
-        let [lnum2, col2] = getpos("'>")[1:2]
-        let lines = getline(lnum1, lnum2)
-        let lines[-1] = lines[-1][: col2 - 2]
-        let lines[0] = lines[0][col1 - 1:]
-        return join(lines, "\n")
-    endfunction
-
 " add a DiffWithSaved() command to see what changes we haven't saved yet
     function! s:DiffWithSaved()
         let filetype=&ft
