@@ -19,8 +19,8 @@ endfunction
 function g:myVim.fileTypes.gitcommit()
     " git commit messages should be 72 characters wide - see:
     " http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-    " I imagine the 'fugitive' plugin handles this, but various configurations
-    " by my vimrc seem to break it, so I do it again manually here.
+    " the 'vim-git' plugin normally handles this, but various configurations
+    " by my vimrc break that, so I do it again manually here.
     set textwidth=72
 
     " turn on spellchecking in git commit messages
