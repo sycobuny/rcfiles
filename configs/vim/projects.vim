@@ -1,3 +1,6 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" projects.vim - Configure vim specially for each git project
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " initialize project-specific settings
 let g:myVim.project = {}
 

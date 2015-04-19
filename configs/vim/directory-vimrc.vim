@@ -1,3 +1,6 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" directory-vimrc.vim - load custom .vimrc files in the current working dir
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " this is the list of places we *don't* want to try to load a
 " directory-specific .vimrc file
 let s:no_directory_vimrc = []

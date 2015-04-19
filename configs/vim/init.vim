@@ -1,3 +1,6 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" init.vim - core custom configuration setup/functions
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " since we're putting stuff in the global scope, we're going to try avoiding
 " too much littering by putting it all inside a g:myVim variable. We also
 " avoid overwriting any of our definitions when reloading, unless specifically

@@ -1,3 +1,6 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" project-sessions.vim - Load/save sessions for each git project
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " this is just locally-scoped shorthand so we don't have to keep writing
 " out the full path
 let s:proj = g:myVim.project
