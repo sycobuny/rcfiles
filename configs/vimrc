@@ -6,60 +6,8 @@ execute 'source ' . $RCDIR . '/configs/vim/init.vim'
 call g:myVim.LoadScript('directory-vimrc')
 call g:myVim.LoadScript('projects')
 call g:myVim.LoadScript('mappings')
-
-" search preferences - boosted from stevelosh
-    " search case-insensitive by default (unless we use uppercase)
-    set ignorecase
-    set smartcase
-    " highlight searches while typing
-    set incsearch
-    set showmatch
-    set hlsearch
-    set smarttab
-
-" filesystem management
-    set nowb       " do not create filename~ backups
-    set noswapfile " do not use .filename.swp/swo swap files
-
-" code style preferences
-    set number       " include line numbers, cause why not.
-    set smartindent  " have VIM auto-indent when possible
-    set tabstop=4    " tabs are 4 characters wide by default for most code
-    set shiftwidth=4 " indent level is also 4 characters wide by default
-    set expandtab    " expand tabs to spaces when I push the tab key
-    set nopaste      " do not assume paste mode by default
-    set backspace=indent,eol,start " allow backspacing over indents/etc.
-
-" syntax highlighting
-    " first off, turn it on
-    set       t_Co=256 " 256-color terminal
-    syntax    enable   " enable highlighting
-
-    " add overflow column warning coloring - if we can. either we'll use the
-    " very nice colorcolumn var provided in 7.3, or matchadd which was
-    " introduced in 7.1 in later patches and solidly exists in 7.2. if neither
-    " exists, we just don't bother.
-    if exists('+colorcolumn')
-        set colorcolumn=79
-    elseif exists('*matchadd')
-        au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
-    endif
-
-    " set text width manually, cause colorcolumn auto-sets it
-    set textwidth=78
-
-    " turn on cursorline because it's easier to track position in multiple
-    " buffers this way - it's apparently an energy hog, but we'll see how it
-    " does on the laptop before I decide whether that's a dealbreaker
-    set cursorline
-
-    " add specific filenames not detected (yet) by any of my plugins
-    au BufNewFile,BufRead Vagrantfile,Gemfile   set ft=ruby
-    au BufNewFile,BufRead *.spreadsheet,*.prawn set ft=ruby
-
-    " fix special case textwidth for git commit messages (fugitive auto-sets
-    " this, but me setting the colorcolumn and textwidth manually breaks that)
-    au FileType gitcommit set textwidth=72
+call g:myVim.LoadScript('settings')
+call g:myVim.LoadScript('filetypes')
 
 " grab the contents of the visual selection
 " thanks to http://stackoverflow.com/a/6271254
@@ -71,13 +19,6 @@ call g:myVim.LoadScript('mappings')
         let lines[0] = lines[0][col1 - 1:]
         return join(lines, "\n")
     endfunction
-
-" turn on spell-checking in markdown, plaintext files, and git commits; turn
-" it off specifically for help files (which is a subset of plaintext files)
-    au FileType markdown  set spell
-    au FileType gitcommit set spell
-    au BufRead  *.txt     set spell
-    au FileType help      set nospell
 
 " add a DiffWithSaved() command to see what changes we haven't saved yet
     function! s:DiffWithSaved()
