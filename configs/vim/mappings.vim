@@ -18,13 +18,6 @@ nnoremap <Leader><C-s> :Git wip<CR>
 " \^L - load remote WIP branch into current working copy
 nnoremap <Leader><C-l> :Git wip-restore<CR>
 
-" remap ]], [[, [], and ][ to find block encoding without C-style
-" yoinked from vim help, see :help object-motions
-nnoremap [[ ?{<CR>w99[{
-nnoremap ][ /}<CR>b00]}
-nnoremap ]] j0[[%/{<CR>
-nnoremap [] k$][%?}<CR>
-
 " \  - clear highlights quickly
 nnoremap <Leader><Space> :noh<CR>
 
