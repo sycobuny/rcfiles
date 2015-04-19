@@ -32,6 +32,18 @@ function g:myVim.fileTypes.markdown()
     set spell
 endfunction
 
+" puppet - custom language for the Puppet config management tool
+function g:myVim.fileTypes.puppet()
+    set shiftwidth=2
+    set tabstop=2
+endfunction
+
+" snippet - custom plugin-defined language for creating auto-expansions
+function g:myVim.fileTypes.snippet()
+    " it uses tabs to indent the expansion sections
+    set noexpandtab
+endfunction
+
 " text - Plain text files (naturally)
 function g:myVim.fileTypes.text()
     set spell
