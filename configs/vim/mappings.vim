@@ -43,18 +43,6 @@ inoremap <Down>  <NOP>
 inoremap <Left>  <NOP>
 inoremap <Right> <NOP>
 
-"""""""""""""
-" VISUAL MODE
-"""""""""""""
-
-" \r - send commands using posgres using <Leader>r
-" idea from Depesz, http://postgr.es/p/1DH
-" slightly modified to dump into register r instead of the buffer
-vnoremap <Leader>r :\|let @r = system('psql -t', VS())<enter>
-
-" \i - break lines around a visual selection
-vnoremap <Leader>i <Esc>a<CR><Esc>gvo<Esc>i<CR><Esc>
-
 """"""""""""""""""""""""""""""""""""""""""""
 " POLY MODE (NORMAL/VISUAL/OPERATOR-PENDING)
 """"""""""""""""""""""""""""""""""""""""""""
