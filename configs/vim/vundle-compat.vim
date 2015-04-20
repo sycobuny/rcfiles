@@ -5,41 +5,58 @@
 set      nocompatible " this should generally be off anyway, but whatever
 filetype off          " not sure why, but I follow directions.
 
+" scope some variables we can use for reference later, and add a shorthand way
+" to reference them
+let g:myVim.vundle.compat = {}
+let s:compat = g:myVim.vundle.compat
+
 " determine whether or not we're using an old edition of Vundle, and behave
 " appropriately.
 if isdirectory(g:myVim.vundle.path)
-    " no need to set up special aliases for compatibility; we're already
-    " upgraded
-    let g:myVim.vundle.compat = 0
-
-    " include the path to Vundle
-    let s:add_path = 'set rtp+=' . g:myVim.vundle.path
-    execute s:add_path
-
-    " have Vundle finish setting itself up
-    call vundle#begin()
-    Plugin 'gmarik/Vundle.vim'
+    let s:compat.path   = 'set rtp+=' . g:myVim.vundle.path
+    let s:compat.plugin = 'Plugin "'  . g:myVim.vundle.plugin . '"'
 else
-    " we don't have the new directory, so let's assume we've got the old one,
-    " and set up compatibility mode
-    let g:myVim.vundle.compat = 1
+    let s:compat.path   = 'set rtp+=' . g:myVim.vundle.path_compat
+    let s:compat.plugin = 'Bundle "'  . g:myVim.vundle.plugin_compat . '"'
+endif
 
-    " include the path to Vundle
-    let s:add_path = 'set rtp+=' . g:myVim.vundle.path_compat
-    execute s:add_path
+" include the path to Vundle, wherever that is
+execute s:compat.path
 
-    " have Vundle finish setting itself up
-    call vundle#rc()
-    Bundle 'gmarik/vundle'
+" figure out how to get a tune out of this trombone
+if exists('&vundle#begin')
+    " since #begin() exists, we'll just use that to start up Vundle
+    let s:compat.Begin    = function('vundle#begin')
 
-    " set up an alias for the 'Plugin' command so we can mimic having the new
-    " Vundle in the rc files, even when we don't
+    " if we have #begin(), we'll need to call #end() to actually get plugins
+    let s:compat.finalize = 1
+else
+    " instead, we use #rc(), which immediately does everything
+    let s:compat.Begin = function('vundle#rc')
+
+    " if there's no #begin(), there's no #end()
+    let s:compat.finalize = 0
+endif
+
+" start up Vundle, and have it manage itself
+call    s:compat.Begin()
+execute s:compat.plugin
+
+" set up an alias for a few 'Plugin' commands that I use so I can mimic having
+" the new version of Vundle in the rc files, even when I don't, really.
+if !exists(':Plugin')
+    " save that we're just wrapping Bundle with a compatibility layer
+    let s:compat.wrapper_commands = 1
+
+    " this is the most important one - it's what the rc files use to install
+    " plugins, so it needs to exist or the rc files will fail to load with
+    " *lots* of error messages
     command -nargs=+ Plugin Bundle <args>
 
-    " set up aliases for 'BundleInstall' and 'BundleUpdate' (the only two
-    " commands I personally use) as well, so I can get used to the new
-    " Vundle names - I'm not going to worry about the autocompletion because I
-    " never use that.
+    " I'm not going to worry about the autocompletion because I never use that
     command -nargs=? PluginInstall BundleInstall<bang> <args>
     command -nargs=0 PluginUpdate  BundleUpdate
+else
+    " save that we're not using a command-wrapping compatibility layer
+    let s:compat.wrapper_commands = 0
 endif
