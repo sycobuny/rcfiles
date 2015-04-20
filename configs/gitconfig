@@ -42,6 +42,6 @@
     # get the historically-first commit's hash
     first-commit = !git log --pretty=oneline | tail -n1 | cut -d\\  -f1
 [push]
-    default = simple
+    default = nothing
 [status]
     showUntrackedFiles = all
