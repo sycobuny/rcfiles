@@ -24,7 +24,7 @@ use Cwd        qw(abs_path);
         'alias.is-dirty'          =>
             '![ $(git status --porcelain | wc -l) -ne 0 ]',
         'filter.gitconfig.clean'  =>
-            '$(git root)/setup/strip-ini-section.pl %f user',
+            '$(git root)/setup/strip-ini-section.pl user',
         'filter.gitconfig.smudge' => 'cat',
     );
 
