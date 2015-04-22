@@ -1,5 +1,25 @@
+let s:rcdir = $RCDIR
+
+" if we don't have an $RCDIR specified, we might need to construct it
+" manually; this is generally when we're run under 'sudo', but it could
+" theoretically happen at other times as well. sadly, this duplicates some
+" work from the .bashrc/.zshrc files, but them's the breaks.
+if s:rcdir == ''
+    let s:home = $HOME
+
+    if s:home != ''
+        let s:dirfile = s:home . '.rcdir'
+        if filereadable(s:dirfile)
+            let s:command = 'cat ' . shellescape(s:dirfile)
+            let s:rcdir   = system(s:command)
+        else
+            let s:rcdir = s:home . '/.rc'
+        endif
+    endif
+endif
+
 " initialize our vimrc loader
-execute 'source ' . $RCDIR . '/configs/vim/init.vim'
+execute 'source ' . s:rcdir . '/configs/vim/init.vim'
 
 " load in our various script files to construct our particular set of
 " settings.
