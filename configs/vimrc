@@ -18,17 +18,22 @@ if s:rcdir == ''
     endif
 endif
 
-" initialize our vimrc loader
-execute 'source ' . s:rcdir . '/configs/vim/init.vim'
+" if we couldn't get a decent $RCDIR substitute (which at this point means not
+" having a $HOME at all, which is weird), then we shouldn't try to load any
+" file based on it, which is essentially our whole configuration.
+if s:rcdir != ''
+    " initialize our vimrc loader
+    execute 'source ' . s:rcdir . '/configs/vim/init.vim'
 
-" load in our various script files to construct our particular set of
-" settings.
-call g:myVim.LoadScript('directory-vimrc')
-call g:myVim.LoadScript('projects')
-call g:myVim.LoadScript('mappings')
-call g:myVim.LoadScript('settings')
-call g:myVim.LoadScript('filetypes')
-call g:myVim.LoadScript('vundle')
+    " load in our various script files to construct our particular set of
+    " settings.
+    call g:myVim.LoadScript('directory-vimrc')
+    call g:myVim.LoadScript('projects')
+    call g:myVim.LoadScript('mappings')
+    call g:myVim.LoadScript('settings')
+    call g:myVim.LoadScript('filetypes')
+    call g:myVim.LoadScript('vundle')
+endif
 
 " add a DiffWithSaved() command to see what changes we haven't saved yet
     function! s:DiffWithSaved()
