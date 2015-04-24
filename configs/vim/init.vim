@@ -26,10 +26,12 @@ if !exists('g:myVim')
         source $MYVIMRC
     endfunction
 
+    " the location of a custom script, given only a name
     function g:myVim.FullScriptPath(script)
         return g:myVim.dir . a:script . '.vim'
     endfunction
 
+    " check whether a given custom script is loaded, given only the name
     function g:myVim.ScriptIsLoaded(script)
         return index(g:myVim.scripts, g:myVim.FullScriptPath(a:script)) >= 0
     endfunction
