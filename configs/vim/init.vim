@@ -39,7 +39,7 @@ if !exists('g:myVim')
         " check if the script has already been loaded
         if g:myVim.ScriptIsLoaded(a:script)
             return
-        end
+        endif
 
         " construct the path to the script, and an eval string to load it
         let l:script = g:myVim.FullScriptPath(a:script)
