@@ -36,8 +36,27 @@ if !exists('g:myVim')
         return index(g:myVim.scripts, g:myVim.FullScriptPath(a:script)) >= 0
     endfunction
 
+    " set a parameter to halt loading of any custom scripts via LoadScript()
+    function g:myVim.HaltLoading()
+        let g:myVim.halt_loading = 1
+    endfunction
+
+    function g:myVim.LoadingHalted()
+        return has_key(g:myVim, 'halt_loading')
+    endfunction
+
+    " stop preventing custom scripts from loading
+    function g:myVim.ResumeLoading()
+        unlet g:myVim.halt_loading
+    endfunction
+
     " a function to load additional script files in this directory
     function g:myVim.LoadScript(script)
+        " don't try to load any scripts, if we were told not to
+        if g:myVim.LoadingHalted()
+            return
+        endif
+
         " check if the script has already been loaded
         if g:myVim.ScriptIsLoaded(a:script)
             return
