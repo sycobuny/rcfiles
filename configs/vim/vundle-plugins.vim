@@ -20,6 +20,15 @@ Plugin 'tpope/vim-git'
 " Plugin to add IDE-like git compatibility features/commands to Vim
 Plugin 'tpope/vim-fugitive'
 
+" Plugin to map file paths to automatic commands/substitutions/etc.
+Plugin 'tpope/vim-projectionist'
+
+" Plugin to run build/server commands asynchronously in alternate windows
+Plugin 'tpope/vim-dispatch'
+
+" Plugin to add Procfile/.env file support and translation
+Plugin 'tpope/vim-dotenv'
+
 " Plugin to add better syntax styling for Markdown, including GFM
 Plugin 'tpope/vim-markdown'
 let g:markdown_fenced_languages = [
