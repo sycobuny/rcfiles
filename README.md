@@ -55,7 +55,8 @@ can either download the file and execute it, or run it directly from
 [GitHub][]:
 
 ```shell
-\curl https://raw.github.com/sycobuny/rcfiles/master/setup/install.pl | perl
+\curl -sSL https://raw.github.com/sycobuny/rcfiles/master/setup/install.pl \
+    | perl
 ```
 
 The slash is sorta-necessary, or at the very least intentional, in case you've
