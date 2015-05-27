@@ -7,7 +7,7 @@ use File::Basename qw(dirname);
 use File::Spec;
 
 use constant DEFAULT_RCDIR  => File::Spec->catfile($ENV{HOME}, '.rc');
-use constant DEFAULT_REMOTE => 'git@github.com:sycobuny/rcfiles.git';
+use constant DEFAULT_REMOTE => 'https://github.com/sycobuny/rcfiles.git';
 
 sub verify_tools {
     my (@required) = qw(perl bash);
