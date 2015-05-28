@@ -3,6 +3,8 @@
 #  -i = Display inode (hardlink reference)
 #  -a = All files (include .files)
 #  -F = Display type hints (/ after dir, * after exec, @ after symlink)
+#  -G = Display colors if available
+#  -h = Display human-friendly file sizes
 alias ls='ls -liaFGh'
 
 # load App::cpanminus into the current perl installation - a common first step
