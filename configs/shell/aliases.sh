@@ -1,11 +1,14 @@
 # list files
 #  -l = Long format (one line per file)
 #  -i = Display inode (hardlink reference)
-#  -a = All files (include .files)
 #  -F = Display type hints (/ after dir, * after exec, @ after symlink)
 #  -G = Display colors if available
 #  -h = Display human-friendly file sizes
-alias ls='ls -liaFGh'
+alias ls='ls -liFGh'
+
+# list all files - same as `ls` above, but with the `-a` flag... which means:
+#  -a = All files (include .files)
+alias lsa='ls -liaFGh'
 
 # load App::cpanminus into the current perl installation - a common first step
 # I take after creating a new perl lib
