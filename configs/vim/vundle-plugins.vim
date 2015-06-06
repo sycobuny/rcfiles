@@ -69,8 +69,8 @@ if exists('*matchadd')
     let g:indent_guides_auto_colors = 0 " we'll set the guide colors
 
     " use colors that work with our colorscheme (Badwolf)
-    autocmd VimEnter,Colorscheme * highlight IndentGuidesOdd  ctermbg=235
-    autocmd VimEnter,Colorscheme * highlight IndentGuidesEven ctermbg=236
+    autocmd VimEnter,Colorscheme * highlight IndentGuidesOdd  ctermbg=248
+    autocmd VimEnter,Colorscheme * highlight IndentGuidesEven ctermbg=252
 
     " make sure indent guides are enabled by default
     autocmd VimEnter * :IndentGuidesEnable
