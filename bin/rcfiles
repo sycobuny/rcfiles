@@ -42,6 +42,11 @@ use Cwd        qw(abs_path);
         sub __bad($);
         sub __die($);
 
+        # work around the git config stripping
+        sub __stash_git_user();
+        sub __restore_git_user();
+        sub __guess_git_user();
+
         # run a command with given environmental parameters
         sub __run($@);
 
@@ -244,6 +249,8 @@ use Cwd        qw(abs_path);
         $status = __failure__ if (mergehist == __failure__);
         $status = __failure__ if (gitconfig == __failure__);
 
+        __restore_git_user && __guess_git_user;
+
         $status
     }
 
@@ -360,9 +367,16 @@ use Cwd        qw(abs_path);
             return __success__;
         }
 
+        __stash_git_user;
         __git 'full-reset';
-        if ($?) { __die 'Could not reset all local modifications' }
-        else    { __good 'RC Files have been reset'               }
+
+        if ($?) {
+            __die 'Could not reset all local modifications'
+        }
+        else {
+            __restore_git_user;
+            __good 'RC Files have been reset'
+        }
     }
 
     # Pull remote changes to the rcfiles repository
@@ -374,6 +388,8 @@ use Cwd        qw(abs_path);
     # exported this way. You must run `reshell` afterwards to accomplish this.
     sub update {
         my ($output, $changed);
+
+        __stash_git_user;
 
         $output  = __git qw(fetch origin);
         if ($?) {
@@ -395,6 +411,7 @@ use Cwd        qw(abs_path);
 
         if ($changed) {
             __exec 'autoconfig';
+            __restore_git_user;
 
             __good 'Update process complete';
             __good '';
@@ -441,6 +458,53 @@ use Cwd        qw(abs_path);
     sub __die($) {
         __warn "fatal: @{[ shift ]}\n";
         __failure__
+    }
+
+    stash_git_user: {
+        my ($userconfig) = {};
+
+        sub __stash_git_user() {
+            my ($output) = __git qw(config --global -l);
+
+            foreach my $line (split("\n", $output)) {
+                next unless $line =~ /^user\.([^=]+)=(.+)$/;
+                my ($key, $value) = ($1, $2);
+
+                $userconfig->{$key} = $value;
+            }
+        }
+
+        sub __restore_git_user() {
+            foreach my $key (keys %{ $userconfig }) {
+                my ($env) = { key => $key, value => $userconfig->{$key} };
+                __git $env, qw(config --global "user.${key}" "${value}");
+            }
+        }
+
+        sub __guess_git_user() {
+            __stash_git_user;
+            return if ($userconfig->{name} && $userconfig->{email});
+
+            unless ($userconfig->{name}) {
+                my ($name) = __git qw(log --format=format:'%an' | head -n1);
+                chomp $name;
+
+                my ($env) = { name => $name };
+                __git $env, qw(config --global user.name = ${name});
+
+                __good "Guessed git user name from commit log as '$name'";
+            }
+
+            unless ($userconfig->{name}) {
+                my ($email) = __git qw(log --format=format:'%ae' | head -n1);
+                chomp $email;
+
+                my ($env) = { email => $email };
+                __git $env, qw(config --global user.email = ${email});
+
+                __good "Guessed git user email from commit log as '$email'";
+            }
+        }
     }
 
     sub __run($@) {
