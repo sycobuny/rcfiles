@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+{
+    package ShortDirname;
+
+    sub IDENTIFIER() { qr/^[a-zA-Z_][a-zA-Z0-9_]*$/ }
+
+    sub __main__ {
+        my ($dirname)   = @_;
+        my (@possibles) = ($dirname);
+        my (%env)       = %ENV; # we're going to mod ENV slightly...
+
+        # do a couple extra-special translations
+        $env{'~'} = $env{HOME}; # not an env var, but worth using
+        delete $env{PWD};       # this could override everything
+        delete $env{OLDPWD};    # this is probably of marginal utility, too
+
+        foreach my $k (keys %env) {
+            next unless $env{$k};
+            next unless $k =~ IDENTIFIER || $k eq '~';
+
+            if ($dirname =~ m{^$env{$k}/} || $dirname eq $env{$k}) {
+                my ($replacement) = $dirname;
+
+                if ($k eq '~') {
+                    $replacement =~ s/^$env{$k}/~/;
+                }
+                else {
+                    $replacement =~ s/^$env{$k}/\$$k/;
+                }
+
+                push @possibles, $replacement;
+            }
+        }
+
+        foreach my $dirname (sort { length($a) <=> length($b) } @possibles) {
+            print "$dirname\n";
+        }
+    }
+}
+
+ShortDirname::__main__(@ARGV) unless caller;
