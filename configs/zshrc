@@ -17,9 +17,11 @@ source "$RCDIR/configs/shell/aliases.sh"
 # zsh-specific configuration from here on out
 HISTFILE="$HOME/.history/zsh"
 
+export ZSH_CUSTOM="$RCDIR/configs/shell/zsh_custom"
+
 # oh-my-zsh
 ZSH=$HOME/.oh-my-zsh
-ZSH_THEME=cloud
+ZSH_THEME=sammy-modified
 plugins=()
 
 # DISABLE_LS_COLORS prevents oh-my-zsh from overriding our ls alias

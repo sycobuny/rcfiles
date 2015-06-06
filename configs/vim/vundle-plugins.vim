@@ -110,6 +110,6 @@ Plugin 'vim-scripts/perl-mauke.vim'
 let perl_include_pod = 1
 let perl_fold        = 1
 
-" Plugin to set up our colorscheme: BadWolf
-Plugin 'sjl/badwolf'
-colorscheme badwolf
+" Plugin to set up our colorscheme: Paper Color
+Plugin 'NLKNguyen/papercolor-theme'
+colorscheme PaperColor
