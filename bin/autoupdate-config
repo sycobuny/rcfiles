@@ -1,0 +1,30 @@
+#!/bin/zsh
+
+function autoupdate-config() {
+    local -a files
+    local key
+
+    if [ $# -eq 0 ]; then
+        files=("${RCDIR}/configs/autoupdate")
+
+        if [ -r "${RCDIR}/site/autoupdate.conf" ]; then
+            files+=("${RCDIR}/site/autoupdate.conf")
+        fi
+
+        if [ -r "${HOME}/.autoupdate.conf" ]; then
+            files+=("${HOME}/.autoupdate.conf")
+        fi
+
+        grep -hvE '^$' $files | grep -vE '^#' | grep '='
+    elif [ $# -eq 1 ]; then
+        key=$1
+        autoupdate-config | grep "^${key}=" | tail -n1 | cut -d= -f2-
+    else
+        echo 'fatal: only one key can be requested at a time' >&2
+        exit 1
+    fi
+
+    exit 0
+}
+
+autoupdate-config "$@"

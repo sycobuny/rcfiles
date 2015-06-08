@@ -1,0 +1,34 @@
+#!/bin/zsh
+
+function rc-autoupdate() {
+    local line key item command rvalue
+
+    if [ $# -lt 1 ]; then
+        for line in $(autoupdate-config); do
+            key=$(echo "$line" | cut -d= -f1 | rev | cut -d. -f1 | rev)
+            item=$(echo "$line" | cut -d= -f1 | rev | cut -d. -f2- | rev)
+
+            if [ "$key" = 'command' ]; then
+                rc-autoupdate "$item"
+            fi
+        done
+    elif [ $# -gt 1 ]; then
+        for item in "$@"; do
+            rc-autoupdate "$item"
+        done
+    else
+        item=$1
+        command=$(autoupdate-config "${item}.command")
+
+        if needs-update "$item"; then
+            eval "${command}"
+            rvalue=$?
+
+            if [ $? -eq 0 ]; then
+                reset-updated "${item}"
+            fi
+        fi
+    fi
+}
+
+rc-autoupdate "$@"

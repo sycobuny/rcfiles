@@ -1,0 +1,28 @@
+#!/bin/zsh
+
+function last-updated() {
+    local udir="${RCDIR}/site/last-updated"
+    local item
+
+    mkdir -p "${udir}"
+
+    if [ $# -lt 1 ]; then
+        echo 'fatal: item name was not given' >&2
+        exit 1
+    elif [ $# -gt 1 ]; then
+        for item in $@; do
+            echo "${item}: $(last-updated "${item}")"
+        done
+    else
+        item=$1
+        if [ -r "${udir}/${item}" ]; then
+            echo "$(cat "${udir}/${item}")"
+        else
+            echo '0'
+        fi
+    fi
+
+    exit 0
+}
+
+last-updated "$@"

@@ -1,0 +1,7 @@
+# how often and how to try to automatically update everything
+autoupdate.command=rc-autoupdate
+autoupdate.expiration=1800
+
+# how often to try to automatically update the rcfiles repository
+rcfiles.command=rcfiles update && reshell
+rcfiles.expiration=604800

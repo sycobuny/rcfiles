@@ -13,6 +13,7 @@ export RCDIR
 source "$RCDIR/configs/shell/environment.sh"
 source "$RCDIR/configs/shell/functions.sh"
 source "$RCDIR/configs/shell/aliases.sh"
+source "$RCDIR/configs/shell/autoupdate.sh"
 
 # bash-specific configuration from here on out
 export HISTFILE="$HOME/.history/bash"

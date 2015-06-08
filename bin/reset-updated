@@ -1,0 +1,22 @@
+#!/bin/zsh
+
+function reset-updated() {
+    local udir="${RCDIR}/site/last-updated"
+    local date="$(date +%s)"
+    local item
+
+    mkdir -p "${udir}"
+
+    if [ $# -lt 1 ]; then
+        echo 'fatal: item name was not given' >&2
+        exit 1
+    else
+        for item in $@; do
+            echo -n "${date}" > "${udir}/${item}"
+        done
+    fi
+
+    exit 0
+}
+
+reset-updated "$@"

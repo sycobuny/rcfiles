@@ -1,0 +1,35 @@
+#!/bin/zsh
+
+function needs-update() {
+    local udir="${RCDIR}/site/last-updated"
+    local item last_updated update_timespan next_update now
+
+    mkdir -p "${udir}"
+
+    if [ $# -lt 1 ]; then
+        echo 'fatal: item name was not given' >&2
+        exit 2
+    elif [ $# -gt 1 ]; then
+        echo 'fatal: only one item can be checked at a time' >&2
+        exit 2
+    else
+        item=$1
+
+        last_updated=$(last-updated "${item}")
+        update_timespan=$(autoupdate-config "${item}.expiration")
+        update_timespan=${update_timespan:-1209600}
+        now=$(date +%s)
+
+        next_update=$(($last_updated + $update_timespan))
+
+        if [ $next_update -le $now ]; then
+            exit 0
+        else
+            exit 1
+        fi
+    fi
+
+    exit 0
+}
+
+needs-update "$@"

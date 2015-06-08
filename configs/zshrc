@@ -13,6 +13,7 @@ export RCDIR
 source "$RCDIR/configs/shell/environment.sh"
 source "$RCDIR/configs/shell/functions.sh"
 source "$RCDIR/configs/shell/aliases.sh"
+source "$RCDIR/configs/shell/autoupdate.sh"
 
 # zsh-specific configuration from here on out
 HISTFILE="$HOME/.history/zsh"
