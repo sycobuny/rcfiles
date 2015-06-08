@@ -5,3 +5,6 @@ autoupdate.expiration=1800
 # how often to try to automatically update the rcfiles repository
 rcfiles.command=rcfiles update
 rcfiles.expiration=604800
+
+# update our vim plugins once every couple of weeks
+vim.command=echo 'Updating vim plugins in the background...' && tmux new -s vim-update -d vim +PluginInstall! +qall
