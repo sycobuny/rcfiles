@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/bin/sh
 
-function last-updated() {
+function last_updated() {
     local udir="${RCDIR}/site/last-updated"
     local item
 
@@ -25,4 +25,4 @@ function last-updated() {
     exit 0
 }
 
-last-updated "$@"
+last_updated "$@"

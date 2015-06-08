@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/bin/sh
 
-function rc-autoupdate() {
+function rc_autoupdate() {
     local line key item command rvalue
 
     if [ $# -lt 1 ]; then
@@ -31,4 +31,4 @@ function rc-autoupdate() {
     fi
 }
 
-rc-autoupdate "$@"
+rc_autoupdate "$@"

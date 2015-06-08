@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/bin/sh
 
-function needs-update() {
+function needs_update() {
     local udir="${RCDIR}/site/last-updated"
     local item last_updated update_timespan next_update now
 
@@ -32,4 +32,4 @@ function needs-update() {
     exit 0
 }
 
-needs-update "$@"
+needs_update "$@"

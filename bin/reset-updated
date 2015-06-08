@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/bin/sh
 
-function reset-updated() {
+function reset_updated() {
     local udir="${RCDIR}/site/last-updated"
     local date="$(date +%s)"
     local item
@@ -12,11 +12,11 @@ function reset-updated() {
         exit 1
     else
         for item in $@; do
-            echo -n "${date}" > "${udir}/${item}"
+            echo "${date}" > "${udir}/${item}"
         done
     fi
 
     exit 0
 }
 
-reset-updated "$@"
+reset_updated "$@"

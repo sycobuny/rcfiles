@@ -1,6 +1,6 @@
-#!/bin/zsh
+#!/bin/sh
 
-function autoupdate-config() {
+function autoupdate_config() {
     local -a files
     local key
 
@@ -27,4 +27,4 @@ function autoupdate-config() {
     exit 0
 }
 
-autoupdate-config "$@"
+autoupdate_config "$@"
