@@ -54,7 +54,7 @@ if !exists(':Plugin')
     command -nargs=+ Plugin Bundle <args>
 
     " I'm not going to worry about the autocompletion because I never use that
-    command -nargs=? PluginInstall BundleInstall<bang> <args>
+    command -nargs=? -bang PluginInstall BundleInstall<bang> <args>
     command -nargs=0 PluginUpdate  BundleUpdate
 else
     " save that we're not using a command-wrapping compatibility layer
