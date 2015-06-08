@@ -112,4 +112,4 @@ let perl_fold        = 1
 
 " Plugin to set up our colorscheme: Paper Color
 Plugin 'NLKNguyen/papercolor-theme'
-colorscheme PaperColor
+silent! colorscheme PaperColor
