@@ -400,7 +400,7 @@ use Cwd        qw(abs_path);
             $changed = 1;
         }
 
-        $output = __git qw(merge --ff-only master origin/master);
+        $output = __git qw(merge --ff-only origin/master);
         if ($?) {
             return __die "Could not merge with remote changes";
         }
