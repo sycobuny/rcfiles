@@ -3,5 +3,5 @@ autoupdate.command=rc-autoupdate
 autoupdate.expiration=1800
 
 # how often to try to automatically update the rcfiles repository
-rcfiles.command=rcfiles update && . $RCDIR/configs/shell/functions-reshell.sh && reshell
+rcfiles.command=rcfiles update
 rcfiles.expiration=604800
