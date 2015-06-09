@@ -1,0 +1,33 @@
+#!/bin/sh
+
+function rc_update() {
+    local item
+
+    if [ $# -lt 1 ]; then
+        echo 'fatal: at least one item must be provided' >&2
+        exit 127
+    elif [ $# -gt 1 ]; then
+        for item in "$@"; do
+            rc-update "${item}"
+        done
+    else
+        item=$1
+        command=$(autoupdate-config "${item}.command")
+
+        if [ -z "${command}" ]; then
+            echo "fatal: cannot update '${item}': don't know what it is" >&2
+            exit 127
+        fi
+
+        eval "${command}"
+        rvalue=$?
+
+        if [ $rvalue -eq 0 ]; then
+            reset-updated "${item}"
+        fi
+
+        exit $rvalue
+    fi
+}
+
+rc_update "$@"
