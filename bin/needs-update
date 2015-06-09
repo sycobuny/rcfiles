@@ -1,10 +1,7 @@
 #!/bin/sh
 
 function needs_update() {
-    local udir="${RCDIR}/site/last-updated"
     local item last_updated update_timespan next_update now
-
-    mkdir -p "${udir}"
 
     if [ $# -lt 1 ]; then
         echo 'fatal: item name was not given' >&2
