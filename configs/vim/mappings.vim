@@ -28,19 +28,3 @@ nnoremap <Leader><Space> :noh<CR>
 " note that this, like any other insert mode mappings, is disabled if you've
 " enabled paste mode
 inoremap jk <C-c>`^
-
-" learn vim the hard way - disable arrow movement
-inoremap <Up>    <NOP>
-inoremap <Down>  <NOP>
-inoremap <Left>  <NOP>
-inoremap <Right> <NOP>
-
-""""""""""""""""""""""""""""""""""""""""""""
-" POLY MODE (NORMAL/VISUAL/OPERATOR-PENDING)
-""""""""""""""""""""""""""""""""""""""""""""
-
-" learn vim the hard way - disable arrow movement
-noremap  <Up>    <NOP>
-noremap  <Down>  <NOP>
-noremap  <Left>  <NOP>
-noremap  <Right> <NOP>
