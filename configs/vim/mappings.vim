@@ -1,23 +1,30 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 " mappings.vim - (re)mappings of common Vim behaviors
 """""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""
+" GENERAL SETTINGS
+""""""""""""""""""
+
+" change the <Leader> to ; instead of \ (the default)
+let mapleader = ';'
+
 """""""""""""
 " NORMAL MODE
 """""""""""""
 
-" \rc - reload the ~/.vimrc file
+" ;rc - reload the ~/.vimrc file
 nnoremap <Leader>rc :source $MYVIMRC<CR>
 
-" \p - switch into and out of paste mode easily
+" ;p - switch into and out of paste mode easily
 nnoremap <Leader>p :set paste!<Enter>
 
-" \^S - save current work to a remote WIP branch \^S
+" ;^S - save current work to a remote WIP branch \^S
 nnoremap <Leader><C-s> :Git wip<CR>
 
-" \^L - load remote WIP branch into current working copy
+" ;^L - load remote WIP branch into current working copy
 nnoremap <Leader><C-l> :Git wip-restore<CR>
 
-" \  - clear highlights quickly
+" ;  - clear highlights quickly
 nnoremap <Leader><Space> :noh<CR>
 
 """""""""""""
