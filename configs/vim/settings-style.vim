@@ -14,15 +14,39 @@ syntax enable  " use syntax highlighting
 " nice colorcolumn var provided in 7.3, or matchadd which was introduced in
 " 7.1 in later patches and solidly exists in 7.2. if neither exists, we just
 " don't bother.
-if exists('+colorcolumn')
-    set colorcolumn=79
-elseif exists('*matchadd')
-    " note that before I was saving this into a w:m2 variable per the Vim Tips
-    " wiki entry, but that was so that I could clear it later if I wanted; I
-    " never wrote a mechanism for doing this, though, so I'm not bothering to
-    " save it anymore, at least until I write such a method.
-    autocmd BufWinEnter * call matchadd('ErrorMsg', '\%>79v.\+', -1)
-endif
+function g:myVim.EnableColorColumn()
+    if !exists('b:maxTextWidth')
+        let b:maxTextWidth = 79
+    endif
+
+    if exists('+colorcolumn')
+        let l:eval = 'setlocal colorcolumn=' . b:maxTextWidth
+        exec l:eval
+    elseif exists('*matchadd')
+        " don't add another colorcolumn on top of what we've already got
+        if !exists('w:colorColumn')
+            let l:match = '\%>' . b:maxTextWidth . 'v.\+'
+            let w:colorColumn = matchadd('ErrorMsg', l:match, -1)
+        endif
+    endif
+endfunction
+
+" remove overflow column warning coloring if it was able to be set
+function g:myVim.DisableColorColumn()
+    if exists('+colorcolumn')
+        setlocal colorcolumn=0
+    elseif exists('*matchadd')
+        " only try to unset the colorColumn if there was one set in the first
+        " place
+        if exists('w:colorColumn')
+            call matchdelete(w:colorColumn)
+            unlet w:colorColumn
+        endif
+    endif
+endfunction
+
+" automatically enable color columns when opening buffers
+autocmd BufWinEnter * call g:myVim.EnableColorColumn()
 
 """"""""""""
 " CODE STYLE
