@@ -24,6 +24,12 @@ nnoremap <Leader><C-s> :Git wip<CR>
 " ;^L - load remote WIP branch into current working copy
 nnoremap <Leader><C-l> :Git wip-restore<CR>
 
+" ;c - Clear color column settings
+nnoremap <Leader>c :call g:myVim.DisableColorColumn()<CR>
+
+" ;C - Enable color column settings
+nnoremap <Leader>C :call g:myVim.EnableColorColumn()<CR>
+
 " ;  - clear highlights quickly
 nnoremap <Leader><Space> :noh<CR>
 
