@@ -34,6 +34,14 @@ nnoremap <Leader>C :call g:myVim.EnableColorColumn()<CR>
 nnoremap <Leader><Space> :noh<CR>
 
 """""""""""""
+" VISUAL MODE
+"""""""""""""
+" NB: : auto-maps to :'<'> in visual mode
+
+" ;' - Swap " to ' inside the current selection
+vnoremap <Leader>' :s/"/'/g<CR>
+
+"""""""""""""
 " INSERT MODE
 """""""""""""
 
