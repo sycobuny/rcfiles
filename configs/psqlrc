@@ -1,3 +1,7 @@
+-- temporarily turn off messages while we initialize, thanks depesz:
+-- http://www.depesz.com/2008/05/18/silencing-commands-in-psqlrc/
+\set QUIET 1
+
 -- change the history file location
 \set HISTFILE ~/.history/psql
 
@@ -11,3 +15,5 @@
 -- display a distinctive unicode character rather than a blank for NULL
 -- values; this helps differentiate from empty strings
 \pset null ¤
+
+\set QUIET 0
