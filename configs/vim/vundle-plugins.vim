@@ -17,6 +17,9 @@ Plugin 'kien/ctrlp.vim'
 " Plugin to auto-align elements in a line
 Plugin 'godlygeek/tabular'
 
+" Plugin to split and join code lines based on contextual information
+Plugin 'AndrewRadev/splitjoin.vim'
+
 " Plugin to add mappings for quickly wrapping w/alanced brackets/quotes/etc.
 Plugin 'tpope/vim-surround'
 
