@@ -11,6 +11,12 @@ Plugin 'Lokaltog/vim-powerline'
 set laststatus=2                  " turn on statusbar
 let g:Powerline_symbols = 'fancy' " use fancy utf-8 symbols
 
+" Plugin to do 'fuzzy search' for files
+Plugin 'kien/ctrlp.vim'
+
+" Plugin to auto-align elements in a line
+Plugin 'godlygeek/tabular'
+
 " Plugin to add mappings for quickly wrapping w/alanced brackets/quotes/etc.
 Plugin 'tpope/vim-surround'
 
