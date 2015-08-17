@@ -14,10 +14,10 @@ let s:compat = g:myVim.vundle.compat
 " appropriately.
 if isdirectory(g:myVim.vundle.path)
     let s:compat.path   = 'set rtp+=' . g:myVim.vundle.path
-    let s:compat.plugin = 'Plugin "'  . g:myVim.vundle.plugin . '"'
+    let s:compat.plugin = "Plugin '"  . g:myVim.vundle.plugin . "'"
 else
     let s:compat.path   = 'set rtp+=' . g:myVim.vundle.path_compat
-    let s:compat.plugin = 'Bundle "'  . g:myVim.vundle.plugin_compat . '"'
+    let s:compat.plugin = "Bundle '"  . g:myVim.vundle.plugin_compat . "'"
 endif
 
 " include the path to Vundle, wherever that is
