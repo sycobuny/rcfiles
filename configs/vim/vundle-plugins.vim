@@ -71,7 +71,7 @@ if exists('*matchadd')
     Plugin 'nathanaelkane/vim-indent-guides'
 
     " prevent errors from cropping up from a missing bgcolor spec
-    highlight Normal ctermbg=black
+    highlight Normal ctermbg=white
 
     let g:indent_guides_start_level = 2 " don't indent-guide the left gutter
     let g:indent_guides_guide_size  = 1 " use one-char-wide highlight cols

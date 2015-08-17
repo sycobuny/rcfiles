@@ -4,11 +4,12 @@
 """"""""""""""
 " EDITOR STYLE
 """"""""""""""
-set number     " display line numbers
-set cursorline " display highlighting on the active line
-set nopaste    " never start in paste mode
-set t_Co=256   " assume 256-color capability
-syntax enable  " use syntax highlighting
+set number           " display line numbers
+set cursorline       " display highlighting on the active line
+set nopaste          " never start in paste mode
+set t_Co=256         " assume 256-color capability
+set background=light " guarantee light backgrounds for PaperColor
+syntax enable        " use syntax highlighting
 
 " add overflow column warning coloring - if we can. either we'll use the very
 " nice colorcolumn var provided in 7.3, or matchadd which was introduced in
