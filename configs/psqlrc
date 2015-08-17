@@ -16,4 +16,7 @@
 -- values; this helps differentiate from empty strings
 \pset null ¤
 
+\set PROMPT1 '%n@%m:%>/%/ %R%# '
+\set PROMPT2 '%n@%m:%>/%/ %R%# '
+
 \set QUIET 0
