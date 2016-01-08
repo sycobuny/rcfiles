@@ -16,6 +16,12 @@
 -- values; this helps differentiate from empty strings
 \pset null ¤
 
+-- this is basically the best thing: automagically convert between horizontal
+-- and vertical output
+-- "tell your friends" - @pvh, you bet I will.
+-- https://github.com/pvh/postgres-bits/blob/master/fin/psql.md#x-auto
+\x auto
+
 \set PROMPT1 '%n@%m:%>/%/ %R%# '
 \set PROMPT2 '%n@%m:%>/%/ %R%# '
 
