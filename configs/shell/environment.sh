@@ -73,6 +73,13 @@ else
     fi
 fi
 
+# python versioning - use pyenv; I never used anything else
+export PYENV_ROOT=$HOME/.pyenv
+if [ -d "$PYENV_ROOT" ]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
 # disable XON/XOFF flow control - I never use this, and it mucks about with
 # using ^S in mappings: see http://unix.stackexchange.com/a/72092
 stty -ixon
