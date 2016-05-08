@@ -98,6 +98,15 @@ autocmd FileType sql call SyntaxRange#Include(
     \       'DO \$PERL\$', '\$PERL\$ LANGUAGE PLPERL;', 'perl'
     \   )
 
+" Plugin to add mappings for easy system clipboard copy/pasting
+Plugin 'christoomey/vim-system-copy'
+
+" Plugin to allow easy custom text objects (dependency for the plugin below)
+Plugin 'kana/vim-textobj-user'
+
+" Plugin to add a couple text objects for dealing with the entire buffer
+Plugin 'kana/vim-textobj-entire'
+
 " Plugin to mimic emacs slime - copy text as commands to another window
 Plugin 'jpalardy/vim-slime'
 let g:slime_target = 'tmux' " tmux rocks \m/
