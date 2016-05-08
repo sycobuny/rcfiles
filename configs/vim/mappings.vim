@@ -33,6 +33,22 @@ nnoremap <Leader>C :call g:myVim.EnableColorColumn()<CR>
 " <Space><Space> - clear highlights quickly
 nnoremap <Leader><Space> :noh<CR>
 
+" gzdf - use Fugitive to diff the current file against the index
+nnoremap gzdf :Gdiff<CR>
+
+" gzdd - use Fugitive to rm the current file
+nnoremap gzdd :Gremove<CR>
+
+" gzdc - use Fugitive to load a "diff --cached" in a new vertical split
+nnoremap gzdc :Gvsplit! diff --cached<CR>
+
+" gzs - use Fugitive to check the status of the current repo
+nnoremap gzs :Gstatus<CR>
+
+" gzp - use Fugitive to push (note this is not a full command - it will wait
+" wait for remote and branch to be typed and for us to then press enter
+nnoremap gzp :Gpush<Space>
+
 """""""""""""
 " VISUAL MODE
 """""""""""""
