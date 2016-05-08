@@ -5,32 +5,32 @@
 " GENERAL SETTINGS
 """"""""""""""""""
 
-" change the <Leader> to ; instead of \ (the default)
-let mapleader = ';'
+" change the <Leader> to spacebar instead of \ (the default)
+let mapleader = ' '
 
 """""""""""""
 " NORMAL MODE
 """""""""""""
 
-" ;rc - reload the ~/.vimrc file
+" <Space>rc - reload the ~/.vimrc file
 nnoremap <Leader>rc :source $MYVIMRC<CR>
 
-" ;p - switch into and out of paste mode easily
+" <Space>p - switch into and out of paste mode easily
 nnoremap <Leader>p :set paste!<Enter>
 
-" ;^S - save current work to a remote WIP branch \^S
+" <Space>^S - save current work to a remote WIP branch \^S
 nnoremap <Leader><C-s> :Git wip<CR>
 
-" ;^L - load remote WIP branch into current working copy
+" <Space>^L - load remote WIP branch into current working copy
 nnoremap <Leader><C-l> :Git wip-restore<CR>
 
-" ;c - Clear color column settings
+" <Space>c - Clear color column settings
 nnoremap <Leader>c :call g:myVim.DisableColorColumn()<CR>
 
-" ;C - Enable color column settings
+" <Space>C - Enable color column settings
 nnoremap <Leader>C :call g:myVim.EnableColorColumn()<CR>
 
-" ;  - clear highlights quickly
+" <Space><Space> - clear highlights quickly
 nnoremap <Leader><Space> :noh<CR>
 
 """""""""""""
