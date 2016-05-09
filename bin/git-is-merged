@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function is_merged() {
+    local check base
+
+    if [ "$#" = 0 ]; then
+        echo "fatal: Must be provided with a ref to verify" >&2
+        exit 2
+    elif [ "$#" = 1 ]; then
+        check=$1
+        base="$(git current-branch)"
+    elif [ "$#" = 2 ]; then
+        check=$1
+        base=$2
+    else
+        echo "fatal: Can only take two arguments" >&2
+        exit 2
+    fi
+
+    if git merge-base --is-ancestor "$check" "$base"; then
+        echo "Is merged"
+        exit 0
+    else
+        echo "!!! Is NOT merged"
+        exit 1
+    fi
+}
+
+is_merged "$@"

@@ -15,6 +15,10 @@
     # 1 if false
     is-dirty = ![ $(git status --porcelain | wc -l) -ne 0 ]
 
+    # also for scripting - test if a commit has been merged in, exit 0 if true
+    # or 1 if false, 2 if an error condition exists
+    is-merged = !git-is-merged "$@"
+
     # sorta like git add -p but for untracked files
     addp = !git add -N $@ && git add -p
 
