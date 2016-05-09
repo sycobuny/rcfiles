@@ -8,8 +8,30 @@
 " I use the old version because the new version requires Python and
 " compilation, which... no.
 Plugin 'Lokaltog/vim-powerline'
-set laststatus=2                  " turn on statusbar
-let g:Powerline_symbols = 'fancy' " use fancy utf-8 symbols
+set laststatus=2 " turn on statusbar
+
+" determine whether we're running under tmux, and if so: make sure we aren't
+" running 2.2. if we are, we can't use special unicode symbols in powerline
+" anymore cause tmux erased its internal UTF tables (so we have to fall
+" back to more-standard unicode symbols):
+" https://github.com/tmux/tmux/commit/26945d7956bf1f160fba72677082e1a9c6968e0c
+let s:tmux = $TMUX
+if s:tmux == ''
+    let s:usefancy = 1
+else
+    let s:tmux_version = system('tmux -V | cut -d\  -f2')
+
+    if match(s:tmux_version, '2.2') < 0
+        let s:usefancy = 1
+    else
+        let s:usefancy = 0
+    endif
+endif
+if s:usefancy
+    let g:Powerline_symbols = 'fancy'   " use fancy utf-8 symols
+else
+    let g:Powerline_symbols = 'unicode' " use less-fancy unicode replacements
+endif
 
 " Plugin to do 'fuzzy search' for files
 Plugin 'kien/ctrlp.vim'
