@@ -1,0 +1,14 @@
+#!/bin/zsh
+
+pg_dest="$HOME/.postgresql"
+
+if echo $1 | perl -e 'exit(<> !~ /^9\.[0-5]$/)'; then
+    rm "$pg_dest"
+    ln -s "$HOME/.postgresql-$1" "$pg_dest"
+
+    echo "Now using PostgreSQL $1"
+    exit 0
+else
+    echo 'Usage: pg-switch <9.x>' >&2
+    exit 1
+fi
