@@ -29,3 +29,5 @@ plugins=()
 # DISABLE_UPDATE_PROMPT makes zsh auto-update without asking
 DISABLE_LS_COLORS=true DISABLE_UPDATE_PROMPT=true \
     source $ZSH/oh-my-zsh.sh
+
+source $RCDIR/configs/shell/zsh_custom/iterm_integration.zsh
