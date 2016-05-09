@@ -45,6 +45,13 @@ else
     fi
 fi
 
+# Perl 6 installation management
+export RAKUDO_ROOT=$HOME/.rakudobrew
+export PATH=$RAKUDO_ROOT/bin:$PATH
+if [ -d "$RAKUDO_ROOT" ]; then
+    echo 'eval "$(rakudobrew init -)"' >> ~/.profile
+fi
+
 # ruby versioning - rbenv is preferred, if not, then maybe RVM is still around
 # note that rbenv and RVM do not play together at all, so we don't try to
 # initialize both, even if both are installed. in fact, having rbenv with RVM
