@@ -89,6 +89,13 @@ if [ -d "$PYENV_ROOT" ]; then
     eval "$(pyenv init -)"
 fi
 
+# node versioning - use nodenv; again, never used anything else
+export NODENV_ROOT=$HOME/.nodenv
+if [ -d "$NODENV_ROOT" ]; then
+    export PATH="$NODENV_ROOT/bin:$PATH"
+    eval "$(nodenv init -)"
+fi
+
 # disable XON/XOFF flow control - I never use this, and it mucks about with
 # using ^S in mappings: see http://unix.stackexchange.com/a/72092
 stty -ixon
