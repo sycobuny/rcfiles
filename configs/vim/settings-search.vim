@@ -9,4 +9,3 @@ set smartcase
 set incsearch
 set showmatch
 set hlsearch
-set smarttab

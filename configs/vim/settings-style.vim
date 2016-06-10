@@ -62,6 +62,7 @@ set smartindent  " have VIM auto-indent when possible
 set tabstop=4    " tabs are 4 characters wide by default for most code
 set shiftwidth=4 " indent level is also 4 characters wide by default
 set expandtab    " expand tabs to spaces when I push the tab key
+set smarttab     " use shiftwidth to insert spaces at the beginning of line
 
 " allow backspacing over indents/etc. - this sort of straddles the line
 " between an editor behavior and a style behavior, but I feel more like it
