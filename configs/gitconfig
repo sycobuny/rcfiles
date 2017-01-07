@@ -10,6 +10,7 @@
 [alias]
     # the way I prefer to see logs - with a colorful graph
     lg = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(green)(%ar)%C(reset) %C(cyan)%s%C(reset) -- %C(bold blue)%an%C(reset)%C(dim white)%d%C(reset)' --abbrev-commit --date=relative
+    lgnc = log --graph --all --format=format:'%h - (%ar) %s -- %an%d' --abbrev-commit --date=relative
 
     # for scripting - test if the directory has been modified, exit 0 if true,
     # 1 if false
