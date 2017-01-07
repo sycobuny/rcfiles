@@ -16,7 +16,7 @@ if [ $(uname -a | grep Darwin | wc -l) -ne 0 ]; then
     source $RCDIR/configs/shell/environment-mac.sh
 fi
 
-export LESS=-MN
+export LESS=-rMN
 
 # perl versioning - plenv is preferred, if not, maybe perlbrew is still around
 # note that perlbrew and plenv do not play together. they have inherited their
