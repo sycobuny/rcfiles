@@ -7,4 +7,4 @@ rcfiles.command=rcfiles update
 rcfiles.expiration=604800
 
 # update our vim plugins once every couple of weeks
-vim.command=echo 'Updating vim plugins in the background...' && tmux new -d -s vim-update "vim +PluginInstall! +qall"
+vim.command=echo 'Updating vim plugins in the background...' && TMUX='' tmux new -d -s vim-update "vim +PluginInstall! +qall"
