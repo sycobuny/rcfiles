@@ -2,7 +2,7 @@
 
 pg_dest="$HOME/.postgresql"
 
-if echo $1 | perl -e 'exit(<> !~ /^9\.[0-5]$/)'; then
+if echo $1 | perl -e 'exit(<> !~ /^9\.[0-6]$/)'; then
     rm "$pg_dest"
     ln -s "$HOME/.postgresql-$1" "$pg_dest"
 
