@@ -1,0 +1,14 @@
+#!/bin/zsh
+
+function root() {
+    local host
+    local command
+
+    host="$1"
+    shift
+    command="$@"
+
+    ssh -t "${host}" sudo -HEs "${command}"
+}
+
+root "$@"

@@ -1,0 +1,12 @@
+#!/bin/zsh
+
+function rmux() {
+    local host="$1"
+    local session="$2"
+    local new="tmux new -s \"${session}\""
+    local attach="tmux attach -t \"${session}\" -d"
+
+    root "${host}" bash -l -c "'${new} || ${attach}'"
+}
+
+rmux "$@"
