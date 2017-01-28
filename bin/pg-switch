@@ -1,10 +1,8 @@
 #!/bin/zsh
 
-pg_dest="$HOME/.postgresql"
-
 if echo $1 | perl -e 'exit(<> !~ /^9\.[0-6]$/)'; then
-    rm "$pg_dest"
-    ln -s "$HOME/.postgresql-$1" "$pg_dest"
+    rm "${PGENV_ACTIVE}"
+    ln -s "${PGENV_ROOT}/versions/$1" "${PGENV_ACTIVE}"
 
     echo "Now using PostgreSQL $1"
     exit 0

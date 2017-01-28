@@ -96,6 +96,14 @@ if [ -d "$NODENV_ROOT" ]; then
     eval "$(nodenv init -)"
 fi
 
+# postgres versioning - this isn't a library like plenv/rbenv/etc., yet, but
+# it follows a similar enough scheme
+export PGENV_ROOT="${HOME}/.pgenv"
+export PGENV_ACTIVE="${PGENV_ROOT}/versions/active"
+if [ -d "$PGENV_ACTIVE" ]; then
+    export PATH="$PGENV_ACTIVE/bin:$PATH"
+fi
+
 # disable XON/XOFF flow control - I never use this, and it mucks about with
 # using ^S in mappings: see http://unix.stackexchange.com/a/72092
 stty -ixon
