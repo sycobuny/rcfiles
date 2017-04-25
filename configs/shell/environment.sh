@@ -9,6 +9,11 @@ unset rcbin
 # add a secondary site-specific bin
 altrcbin=$RCDIR/site/bin
 [[ :$PATH: == *:"$altrcbin":* ]] || PATH=$PATH:$altrcbin
+
+# use the site-specific bin for the target of whalebrew installations
+export WHALEBREW_INSTALL_PATH="${altrcbin}"
+
+# clear out the alt bin, we don't need it to stick around on its own
 unset altrcbin
 
 # mac-only configurations
